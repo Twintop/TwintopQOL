@@ -3,7 +3,7 @@ local _, TwintopQOL = ...
 -- Changelog shown by the News window (News.lua renders it). Markdown; newest release first.
 TwintopQOL.NewsContent = [====[
 
-# 1.0.0.0-release (2026-11-03)
+# 1.0.0-release (2026-11-03)
 ## General
 
 - Add a News window that shows this changelog when a new version is released. Open it any time with `/tqol news`.

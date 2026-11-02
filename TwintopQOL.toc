@@ -1,14 +1,14 @@
-## Interface: 120001
+## Interface: 120105
 ## Title: Twintop QOL
 ## Author: Twintop
 ## X-AuthorServer: Frostmourne-US/OCE
-## Version: 1.0.0.0
+## Version: 1.0.0
 ## X-ReleaseType: release
 ## SavedVariables: TwintopQOLSaved
 ## DefaultState: enabled
-## Notes: A grab-bag of quality-of-life (and silly) toys: dad jokes, ready check replies, and a talent printout.
+## Notes: A grab-bag of quality-of-life (and silly) things for World of Warcraft.
 ## X-Category: misc
-## X-Website: https://github.com/Twintop
+## X-Website: https://github.com/Twintop/TwintopQOL
 
 Libs\LibStub.lua
 Libs\LibMarkdown\LibMarkdown.xml

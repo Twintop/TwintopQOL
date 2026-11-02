@@ -1,2 +1,2 @@
-# TwintopQOL
-A collection of useful, stupid, or funny quality of life features for World of Warcraft. You might find some of them useful.
+# Twintop Quality of Life
+A grab-bag of quality-of-life (and silly) things for World of Warcraft.
