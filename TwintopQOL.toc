@@ -10,7 +10,12 @@
 ## X-Category: misc
 ## X-Website: https://github.com/Twintop
 
+Libs\LibStub.lua
+Libs\LibMarkdown\LibMarkdown.xml
+
 Core.lua
 Jokes.lua
 Silly.lua
 Talents.lua
+NewsContent.lua
+News.lua

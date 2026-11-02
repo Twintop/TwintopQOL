@@ -59,7 +59,7 @@ function TwintopQOL:ParseCmdString(msg)
 end
 
 local function PrintHelp()
-    TwintopQOL:Print("Commands: |cFFFFFF00joke|r (tell a joke now), |cFFFFFF00silly|r {on|off} (ready-check \"Yes chef!\" + wipe jokes), |cFFFFFF00talents|r / |cFFFFFF00df|r (toggle talent window).")
+    TwintopQOL:Print("Commands: |cFFFFFF00joke|r (tell a joke now), |cFFFFFF00silly|r {on|off} (ready-check \"Yes chef!\" + wipe jokes), |cFFFFFF00talents|r / |cFFFFFF00df|r (toggle talent window), |cFFFFFF00news|r (toggle news window).")
 end
 
 SLASH_TWINTOPQOL1 = "/tqol"
@@ -84,6 +84,8 @@ SlashCmdList.TWINTOPQOL = function(msg)
         end
     elseif cmd == "talents" or cmd == "df" then
         TwintopQOL.Talents:Toggle()
+    elseif cmd == "news" then
+        TwintopQOL.News:Toggle()
     else
         PrintHelp()
     end
@@ -91,10 +93,16 @@ end
 
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("ADDON_LOADED")
+eventFrame:RegisterEvent("PLAYER_LOGIN")
 eventFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == "TwintopQOL" then
         TwintopQOLSaved = TwintopQOLSaved or {}
         TwintopQOLSaved.seen = TwintopQOLSaved.seen or {}
+        TwintopQOLSaved.news = TwintopQOLSaved.news or {}
+        if TwintopQOLSaved.news.enabled == nil then
+            TwintopQOLSaved.news.enabled = true
+        end
+        TwintopQOLSaved.news.lastUpdate = TwintopQOLSaved.news.lastUpdate or ""
 
         -- Restore silly mode from last session.
         if TwintopQOLSaved.sillyEnabled then
@@ -102,5 +110,8 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
         end
 
         self:UnregisterEvent("ADDON_LOADED")
+    elseif event == "PLAYER_LOGIN" then
+        TwintopQOL.News:Init()
+        self:UnregisterEvent("PLAYER_LOGIN")
     end
 end)
