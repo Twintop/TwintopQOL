@@ -43,8 +43,8 @@ The workflow in `.github\workflows\release.yml` runs the checks in `checks.yml`,
 `stage.ps1` as a workflow artifact, and hands the checkout to the BigWigs packager. The packager builds the
 zip, creates the GitHub release with it attached, and uploads to CurseForge and Wago when the TOC has an
 `X-Curse-Project-ID` or `X-Wago-ID` line and the `CF_API_KEY` or `WAGO_API_TOKEN` secret exists. A tag
-containing `alpha` or `beta` is a pre-release everywhere. The changelog is generated from the git commits since
-the previous tag.
+containing `alpha` or `beta` is a pre-release everywhere. The changelog on every site is the newest release's
+section of `NewsContent.lua` (from its first `# ` heading to the next), which the workflow writes to `CHANGELOG.md`.
 
 **Dry run.** Run the workflow by hand (workflow_dispatch): the packager builds the zip with `-d` (no uploads,
 no GitHub release) and the zip is attached to the run as the `packager` artifact.

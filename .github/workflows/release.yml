@@ -7,8 +7,8 @@ name: Release
 # The checks job runs checks.yml, the same offline checks every pull request runs. The stage job then builds the
 # zip with build/stage.ps1 as a workflow artifact.
 # The publish job runs the BigWigs packager, which creates the GitHub release, attaches its zip, and
-# uploads to CurseForge / Wago for every site whose token secret exists. Its changelog is generated from
-# the git commits since the previous tag. A workflow_dispatch run only builds the zip.
+# uploads to CurseForge / Wago for every site whose token secret exists. Its changelog is the newest release's
+# section of NewsContent.lua, written to CHANGELOG.md. A workflow_dispatch run only builds the zip.
 
 on:
   push:
@@ -111,6 +111,14 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then ARGS="$ARGS -d"; fi
           echo "args=$ARGS" >> "$GITHUB_OUTPUT"
           echo "$ARGS"
+
+      - name: Write the changelog from NewsContent.lua
+        shell: bash
+        run: |
+          # The newest release's section: from the first "# " heading to the next one or the end of the string.
+          awk '/^\]====\]/ { exit } /^# / { if (found) exit; found = 1 } found' NewsContent.lua | tr -d '\r' > CHANGELOG.md
+          if [ ! -s CHANGELOG.md ]; then echo "NewsContent.lua has no release section."; exit 1; fi
+          cat CHANGELOG.md
 
       - name: Package and upload with the BigWigs packager
         uses: BigWigsMods/packager@v2
