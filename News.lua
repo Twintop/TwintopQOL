@@ -5,7 +5,6 @@ local L = TwintopQOL.Localization
 local LSHM = LibStub("LibSimpleHTMLMarkdown-1.0")
 
 local ADDON_VERSION = C_AddOns.GetAddOnMetadata(addonName, "Version") .. "-" .. C_AddOns.GetAddOnMetadata(addonName, "X-ReleaseType")
-local URL_POPUP = "TWINTOPQOL_NEWS_URL"
 
 local frame
 
@@ -16,10 +15,10 @@ local function OnHyperlinkClick(_, link, text)
     if link == "window:close" then
         TwintopQOL.News:Hide()
     elseif link:match("https?://") then
-        StaticPopup_Show(URL_POPUP, nil, nil, { title = text, url = link })
+        TwintopQOL:ShowUrl(text, link)
     elseif link:match("^#%d+$") then
         local url = L["GitHubIssuesUrl"] .. link:sub(2)
-        StaticPopup_Show(URL_POPUP, nil, nil, { title = string.format(L["NewsHyperlinkIssueOnGitHub"], link), url = url })
+        TwintopQOL:ShowUrl(string.format(L["NewsHyperlinkIssueOnGitHub"], link), url)
     end
 end
 
@@ -113,35 +112,6 @@ local function CreateMainFrame()
     LSHM.config["/pre"]    = "|r</p><br />"
 
     BuildReader(frame)
-
-    -- ... and this is the popup the URL links open.
-    StaticPopupDialogs[URL_POPUP] = {
-        OnShow = function(self, data)
-            self:SetWidth(450)
-            self:SetFormattedText(L["UrlPopupText"], data.title)
-            self:GetEditBox():SetText(data.url)
-            self:GetEditBox():SetAutoFocus(true)
-            self:GetEditBox():HighlightText()
-        end,
-        OnAccept = function(self)
-            self:Hide()
-        end,
-        EditBoxOnEnterPressed = function(self)
-            self:GetParent():Hide()
-        end,
-        EditBoxOnEscapePressed = function(self)
-            self:GetParent():Hide()
-        end,
-        text = "",
-        button1 = L["OK"],
-        hasEditBox = true,
-        hasWideEditBox = true,
-        editBoxWidth = 400,
-        timeout = 60,
-        whileDead = true,
-        closeButton = true,
-        hideOnEscape = true
-    }
 end
 
 ----------------------------------------------------------------------

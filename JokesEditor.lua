@@ -295,7 +295,7 @@ end
 local function BuildPage(panel)
     local titleText = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("TOPLEFT", 0, 0)
-    titleText:SetText(L["JokesPageTitle"])
+    titleText:SetText(L["JokesListPageTitle"])
 
     local instructions = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     instructions:SetPoint("TOPLEFT", 0, -26)
@@ -347,4 +347,4 @@ local function BuildPage(panel)
     end)
 end
 
-TwintopQOL.Window:RegisterPage("jokes", L["JokesPageTitle"], BuildPage)
+TwintopQOL.Window:RegisterPage("jokesList", L["JokesListPageTitle"], BuildPage, "jokes")

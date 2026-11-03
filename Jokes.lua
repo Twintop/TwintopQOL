@@ -535,6 +535,57 @@ end
 -- Hashes for the active list, rebuilt whenever the list changes.
 local jokeHashes
 
+-- Content types wipe jokes can be switched on or off for, in Configuration page order.
+TwintopQOL.Jokes.CONTENT_TYPES = {
+    "openWorld",
+    "dungeonNormal",
+    "dungeonHeroic",
+    "dungeonMythic",
+    "mythicPlus",
+    "delve",
+    "scenario",
+    "raidLFR",
+    "raidNormal",
+    "raidHeroic",
+    "raidMythic",
+    "battleground",
+    "arena"
+}
+
+-- Difficulty IDs that aren't Normal; anything unlisted counts as Normal.
+local DUNGEON_DIFFICULTIES = {
+    [2] = "dungeonHeroic",
+    [8] = "mythicPlus",
+    [23] = "dungeonMythic"
+}
+local RAID_DIFFICULTIES = {
+    [5] = "raidHeroic",
+    [6] = "raidHeroic",
+    [7] = "raidLFR",
+    [15] = "raidHeroic",
+    [16] = "raidMythic",
+    [17] = "raidLFR"
+}
+local DELVE_DIFFICULTY = 208
+
+---Returns the content type of the player's current instance.
+---@return string
+local function GetContentType()
+    local _, instanceType, difficultyId = GetInstanceInfo()
+    if instanceType == "party" then
+        return DUNGEON_DIFFICULTIES[difficultyId] or "dungeonNormal"
+    elseif instanceType == "raid" then
+        return RAID_DIFFICULTIES[difficultyId] or "raidNormal"
+    elseif instanceType == "scenario" then
+        return difficultyId == DELVE_DIFFICULTY and "delve" or "scenario"
+    elseif instanceType == "pvp" then
+        return "battleground"
+    elseif instanceType == "arena" then
+        return "arena"
+    end
+    return "openWorld"
+end
+
 ---Returns the active joke list: the player's custom list, or the defaults.
 ---@return string[]
 local function GetActiveList()
@@ -558,6 +609,10 @@ local function PickJoke()
     local jokeList = GetActiveList()
     TwintopQOLSaved = TwintopQOLSaved or {}
     TwintopQOLSaved.seen = TwintopQOLSaved.seen or {}
+    if not TwintopQOLSaved.jokesConfig.noRepeats then
+        return jokeList[fastrandom(1, #jokeList)]
+    end
+
     local seen = TwintopQOLSaved.seen
     local hashes = GetHashes()
 
@@ -631,3 +686,35 @@ function TwintopQOL.Jokes:Send()
         C_ChatInfo.SendChatMessage(PickJoke(), "PARTY")
     end
 end
+
+---Fills in missing Configuration settings. Called once saved variables are loaded.
+function TwintopQOL.Jokes:Init()
+    -- Wipe jokes used to ride on silly mode, so an existing save keeps whatever it had.
+    if TwintopQOLSaved.jokesConfig == nil then
+        TwintopQOLSaved.jokesConfig = { enabled = TwintopQOLSaved.sillyEnabled == true }
+    end
+
+    local config = TwintopQOLSaved.jokesConfig
+    if config.noRepeats == nil then
+        config.noRepeats = true
+    end
+    config.content = config.content or {}
+    for _, contentType in ipairs(self.CONTENT_TYPES) do
+        if config.content[contentType] == nil then
+            config.content[contentType] = true
+        end
+    end
+end
+
+local eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("ENCOUNTER_END")
+eventFrame:SetScript("OnEvent", function(_, _, _, _, _, _, success)
+    local config = TwintopQOLSaved.jokesConfig
+    if success ~= 1 and config.enabled and config.content[GetContentType()] then
+        C_Timer.After(0, function()
+            C_Timer.After(3, function()
+                TwintopQOL.Jokes:Send()
+            end)
+        end)
+    end
+end)
