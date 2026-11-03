@@ -12,11 +12,13 @@ local FOOTER_HEIGHT = 24
 local NAV_WIDTH = 160
 local NAV_BUTTON_HEIGHT = 22
 local NAV_BUTTON_PAD = 2
+local NAV_INDENT = 20
 local CONTENT_PADDING = 10
 
 local frame
 local navFrame
 local contentArea
+-- Nav entries by key: pages have a builder, headers have children.
 local pages = {}
 local pageOrder = {}
 local selectedKey
@@ -30,12 +32,21 @@ local function ConfigureDragHandle(handleFrame)
     handleFrame:SetScript("OnDragStop", function() frame:StopMovingOrSizing() end)
 end
 
----Creates a nav button with hover and selected textures.
+---Creates a nav button with hover and selected textures, plus an expand arrow for headers.
 ---@param label string
+---@param isHeader boolean
 ---@return Button
-local function CreateNavButton(label)
+local function CreateNavButton(label, isHeader)
     local btn = CreateFrame("Button", nil, navFrame)
     btn:SetHeight(NAV_BUTTON_HEIGHT)
+
+    if isHeader then
+        local arrow = btn:CreateTexture(nil, "OVERLAY")
+        arrow:SetSize(12, 12)
+        arrow:SetPoint("RIGHT", -2, 0)
+        arrow:SetTexture("Interface\\ChatFrame\\ChatFrameExpandArrow")
+        btn.arrow = arrow
+    end
 
     local highlight = btn:CreateTexture(nil, "HIGHLIGHT")
     highlight:SetAllPoints()
@@ -56,11 +67,41 @@ local function CreateNavButton(label)
     return btn
 end
 
+---Lays out the nav buttons, skipping the children of collapsed headers.
+local function RefreshNav()
+    local yOffset = -4
+    for _, key in ipairs(pageOrder) do
+        local entry = pages[key]
+        entry.button:SetPoint("TOPLEFT", 4, yOffset)
+        entry.button:SetPoint("RIGHT", -4, 0)
+        yOffset = yOffset - NAV_BUTTON_HEIGHT - NAV_BUTTON_PAD
+
+        if entry.children then
+            -- Right-pointing when collapsed, down-pointing when expanded.
+            entry.button.arrow:SetRotation(entry.collapsed and 0 or (-math.pi / 2))
+            for _, childKey in ipairs(entry.children) do
+                local child = pages[childKey]
+                child.button:SetShown(not entry.collapsed)
+                if not entry.collapsed then
+                    child.button:SetPoint("TOPLEFT", 4 + NAV_INDENT, yOffset)
+                    child.button:SetPoint("RIGHT", -4, 0)
+                    yOffset = yOffset - NAV_BUTTON_HEIGHT - NAV_BUTTON_PAD
+                end
+            end
+        end
+    end
+end
+
 ---Shows a page, building its panel on first use.
 ---@param key string
 local function SelectPage(key)
     local page = pages[key]
-    if not page then return end
+    if not page or not page.builder then return end
+
+    if page.parentKey then
+        pages[page.parentKey].collapsed = false
+        RefreshNav()
+    end
 
     if not page.panel then
         page.panel = CreateFrame("Frame", nil, contentArea)
@@ -183,28 +224,44 @@ local function CreateMainFrame()
     contentArea:SetPoint("TOPLEFT", navFrame, "TOPRIGHT", 1, 0)
     contentArea:SetPoint("BOTTOMRIGHT", -4, 4 + FOOTER_HEIGHT + 1)
 
-    local yOffset = -4
-    for _, key in ipairs(pageOrder) do
-        local page = pages[key]
-        page.button = CreateNavButton(page.label)
-        page.button:SetPoint("TOPLEFT", 4, yOffset)
-        page.button:SetPoint("RIGHT", -4, 0)
-        page.button:SetScript("OnClick", function() SelectPage(key) end)
-        yOffset = yOffset - NAV_BUTTON_HEIGHT - NAV_BUTTON_PAD
+    for key, entry in pairs(pages) do
+        entry.button = CreateNavButton(entry.label, entry.children ~= nil)
+        if entry.children then
+            entry.button:SetScript("OnClick", function()
+                entry.collapsed = not entry.collapsed
+                RefreshNav()
+            end)
+        else
+            entry.button:SetScript("OnClick", function() SelectPage(key) end)
+        end
     end
+    RefreshNav()
 end
 
 ----------------------------------------------------------------------
 -- Public API
 ----------------------------------------------------------------------
 
+---Adds a collapsible header to the nav list. Its pages register with it as their parent.
+---@param key string
+---@param label string
+function TwintopQOL.Window:RegisterHeader(key, label)
+    pages[key] = { key = key, label = label, children = {}, collapsed = false }
+    pageOrder[#pageOrder + 1] = key
+end
+
 ---Adds a page to the nav list. Pages must be registered before the window is first shown.
 ---@param key string
 ---@param label string
 ---@param builder fun(panel: Frame) Fills the page's panel; called the first time the page is shown.
-function TwintopQOL.Window:RegisterPage(key, label, builder)
-    pages[key] = { key = key, label = label, builder = builder }
-    pageOrder[#pageOrder + 1] = key
+---@param parentKey string|nil A header registered with RegisterHeader.
+function TwintopQOL.Window:RegisterPage(key, label, builder, parentKey)
+    pages[key] = { key = key, label = label, builder = builder, parentKey = parentKey }
+    if parentKey then
+        table.insert(pages[parentKey].children, key)
+    else
+        pageOrder[#pageOrder + 1] = key
+    end
 end
 
 ---@return Frame
@@ -219,7 +276,11 @@ function TwintopQOL.Window:Show(key)
     CreateMainFrame()
     frame:Show()
     frame:Raise()
-    SelectPage(key or selectedKey or pageOrder[1])
+    local firstKey = pageOrder[1]
+    if pages[firstKey].children then
+        firstKey = pages[firstKey].children[1]
+    end
+    SelectPage(key or selectedKey or firstKey)
 end
 
 function TwintopQOL.Window:Hide()

@@ -71,7 +71,7 @@ SlashCmdList.TWINTOPQOL = function(msg)
     elseif cmd == "joke" then
         TwintopQOL.Jokes:Send()
     elseif cmd == "jokes" then
-        TwintopQOL.Window:Toggle("jokes")
+        TwintopQOL.Window:Toggle("jokesList")
     elseif cmd == "silly" then
         local toggle = TwintopQOL:ParseCmdString(subcmd)
         if toggle == "on" then
@@ -106,6 +106,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
             TwintopQOLSaved.news.enabled = true
         end
         TwintopQOLSaved.news.lastUpdate = TwintopQOLSaved.news.lastUpdate or ""
+        TwintopQOL.Jokes:Init()
 
         -- Restore silly mode from last session.
         if TwintopQOLSaved.sillyEnabled then
