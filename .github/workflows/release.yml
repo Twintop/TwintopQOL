@@ -87,7 +87,7 @@ jobs:
           if-no-files-found: error
 
   publish:
-    # The packager reads the game type from the TOC and the site ids from its X-Curse-Project-ID / X-Wago-ID
+    # The packager reads the game types from the TOC and the site ids from its X-Curse-Project-ID / X-Wago-ID
     # lines. It skips any site whose id or token is missing. The TOC has no X-WoWI-ID, so WoWInterface is not used.
     name: Package and publish
     needs: stage
@@ -105,7 +105,8 @@ jobs:
         id: pkg
         shell: bash
         run: |
-          ARGS="-m .pkgmeta -g retail"
+          # No -g: the packager reads every game type from the TOC's Interface line (retail and Forever).
+          ARGS="-m .pkgmeta"
           # A manual run is a build-only dry run.
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then ARGS="$ARGS -d"; fi
           echo "args=$ARGS" >> "$GITHUB_OUTPUT"
