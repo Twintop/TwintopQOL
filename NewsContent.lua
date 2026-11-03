@@ -3,6 +3,14 @@ local _, TwintopQOL = ...
 -- Changelog shown by the News window (News.lua renders it). Markdown; newest release first.
 TwintopQOL.NewsContent = [====[
 
+# 1.0.1-release (2026-11-04)
+## Jokes
+
+- Run copyedit over the jokes list to fix typos, grammar, punctuation, and remove some that were effectively dungeon master jokes. The list is now ~450 jokes, down from ~500.
+- Only new users get this updated joke list. If you'd like the updated jokes, you can reset your joke list to the defaults in the Joke Editor.
+
+---
+
 # 1.0.0-release (2026-11-03)
 
 The first public release of Twintop QOL: a grab-bag of quality-of-life (and silly) things for World of Warcraft.
