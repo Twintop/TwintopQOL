@@ -4,6 +4,7 @@
 ## X-AuthorServer: Frostmourne-US/OCE
 ## Version: 1.0.0
 ## X-ReleaseType: release
+## X-ReleaseDate: 2026-11-03
 ## SavedVariables: TwintopQOLSaved
 ## DefaultState: enabled
 ## Notes: A grab-bag of quality-of-life (and silly) things for World of Warcraft.
@@ -38,5 +39,6 @@ JokesConfig.lua
 JokesEditor.lua
 Silly.lua
 Talents.lua
+About.lua
 NewsContent.lua
 News.lua

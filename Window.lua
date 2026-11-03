@@ -21,6 +21,8 @@ local contentArea
 -- Nav entries by key: pages have a builder, headers have children.
 local pages = {}
 local pageOrder = {}
+-- Pages listed after every other nav entry.
+local bottomOrder = {}
 local selectedKey
 
 ---Makes a frame act as a drag handle for the main window.
@@ -70,7 +72,15 @@ end
 ---Lays out the nav buttons, skipping the children of collapsed headers.
 local function RefreshNav()
     local yOffset = -4
+    local navKeys = {}
     for _, key in ipairs(pageOrder) do
+        navKeys[#navKeys + 1] = key
+    end
+    for _, key in ipairs(bottomOrder) do
+        navKeys[#navKeys + 1] = key
+    end
+
+    for _, key in ipairs(navKeys) do
         local entry = pages[key]
         entry.button:SetPoint("TOPLEFT", 4, yOffset)
         entry.button:SetPoint("RIGHT", -4, 0)
@@ -262,6 +272,15 @@ function TwintopQOL.Window:RegisterPage(key, label, builder, parentKey)
     else
         pageOrder[#pageOrder + 1] = key
     end
+end
+
+---Adds a page that always sits at the bottom of the nav list.
+---@param key string
+---@param label string
+---@param builder fun(panel: Frame) Fills the page's panel; called the first time the page is shown.
+function TwintopQOL.Window:RegisterBottomPage(key, label, builder)
+    pages[key] = { key = key, label = label, builder = builder }
+    bottomOrder[#bottomOrder + 1] = key
 end
 
 ---@return Frame
