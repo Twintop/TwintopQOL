@@ -9,7 +9,9 @@
 ## DefaultState: enabled
 ## Notes: A grab-bag of quality-of-life (and silly) things for World of Warcraft.
 ## X-Category: misc
-## X-Website: https://github.com/Twintop/TwintopQOL
+## X-Website: https://github.com/Twintop/TwintopQOL 
+## X-Curse-Project-ID: 1780864
+## X-Wago-ID: aND9kg6o
 
 Libs\LibStub.lua
 Libs\LibSimpleHTMLMarkdown\LibSimpleHTMLMarkdown.xml
