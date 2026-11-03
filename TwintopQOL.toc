@@ -7,6 +7,7 @@
 ## X-ReleaseDate: 2026-11-03
 ## SavedVariables: TwintopQOLSaved
 ## DefaultState: enabled
+## IconTexture: Interface\AddOns\TwintopQOL\Images\icon.png
 ## Notes: A grab-bag of quality-of-life (and silly) things for World of Warcraft.
 ## X-Category: misc
 ## X-Website: https://github.com/Twintop/TwintopQOL 

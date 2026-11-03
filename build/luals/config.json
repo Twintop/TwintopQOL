@@ -34,7 +34,8 @@
             "YES",
             "NO",
             "ScrollingEdit_OnUpdate",
-            "CLOSE"
+            "CLOSE",
+            "Settings"
         ]
     },
     "type": {

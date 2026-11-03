@@ -399,3 +399,21 @@ function TwintopQOL.Window:Toggle(key)
         self:Show(key)
     end
 end
+
+-- Stub panel in Blizzard's Options > AddOns list that points at the real window.
+local blizzardStub = CreateFrame("Frame", "TwintopQOLPanel_BlizzardStub")
+local stubTitle = blizzardStub:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+stubTitle:SetPoint("TOPLEFT", 16, -16)
+stubTitle:SetText(L["TwintopQOL"])
+local stubDesc = blizzardStub:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+stubDesc:SetPoint("TOPLEFT", stubTitle, "BOTTOMLEFT", 0, -8)
+stubDesc:SetText(L["OpenOptionsDescription"])
+local stubButton = CreateFrame("Button", nil, blizzardStub, "UIPanelButtonTemplate")
+stubButton:SetSize(260, 30)
+stubButton:SetPoint("TOPLEFT", stubDesc, "BOTTOMLEFT", 0, -12)
+stubButton:SetText(L["OpenOptions"])
+stubButton:SetScript("OnClick", function()
+    TwintopQOL.Window:Show()
+end)
+local addonCategory = Settings.RegisterCanvasLayoutCategory(blizzardStub, L["TwintopQOL"])
+Settings.RegisterAddOnCategory(addonCategory)
