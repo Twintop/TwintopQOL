@@ -17,6 +17,13 @@
         "globals": [
             "SlashCmdList",
             "LE_PARTY_CATEGORY_INSTANCE",
+            "LE_PARTY_CATEGORY_HOME",
+            "SAY",
+            "YELL",
+            "RAID",
+            "RAID_WARNING",
+            "PARTY",
+            "EMOTE",
             "UISpecialFrames",
             "ChatEdit_InsertLink",
             "ChatFrameUtil",

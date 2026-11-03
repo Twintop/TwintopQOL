@@ -13,5 +13,11 @@ L["OK"] = OKAY
 L["Yes"] = YES
 L["No"] = NO
 L["Close"] = CLOSE
+L["ChannelSay"] = SAY
+L["ChannelYell"] = YELL
+L["ChannelRaid"] = RAID
+L["ChannelRaidWarning"] = RAID_WARNING
+L["ChannelParty"] = PARTY
+L["ChannelEmote"] = EMOTE
 
 TwintopQOL.Localization = L

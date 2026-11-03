@@ -25,7 +25,7 @@ A grab-bag of quality-of-life (and silly) things for World of Warcraft. Tell you
 
 ### General
 
-- Ready check response: when you answer "ready" to a ready check, says something in `/say`. "Yes chef!" by default, or type your own. Turn it on in the General page.
+- Ready check response: when you answer "ready" to a ready check, sends a message to the channel you pick: say (the default), yell, raid, raid warning, party, or emote. "Yes chef!" by default, or type your own. Turn it on in the General page.
 
 ### Talents
 
