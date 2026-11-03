@@ -11,7 +11,7 @@
 ## X-Website: https://github.com/Twintop/TwintopQOL
 
 Libs\LibStub.lua
-Libs\LibMarkdown\LibMarkdown.xml
+Libs\LibSimpleHTMLMarkdown\LibSimpleHTMLMarkdown.xml
 
 Core.lua
 Window.lua

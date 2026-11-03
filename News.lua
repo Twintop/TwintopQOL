@@ -1,7 +1,7 @@
 local addonName, TwintopQOL = ...
 TwintopQOL.News = TwintopQOL.News or {}
 
-local LMD = LibStub("LibMarkdown-1.0")
+local LSHM = LibStub("LibSimpleHTMLMarkdown-1.0")
 
 local ADDON_VERSION = C_AddOns.GetAddOnMetadata(addonName, "Version") .. "-" .. C_AddOns.GetAddOnMetadata(addonName, "X-ReleaseType")
 local ISSUE_URL = "https://github.com/Twintop/TwintopQOL/issues/"
@@ -51,7 +51,7 @@ local function BuildReader(parent)
     simpleHtml:SetScript("OnHyperlinkEnter", function() SetCursor("Interface\\CURSOR\\vehichleCursor.PNG") end)
     simpleHtml:SetScript("OnHyperlinkLeave", function() SetCursor(nil) end)
 
-    simpleHtml:SetText(LMD:ToHTML(TwintopQOL.NewsContent or ""))
+    simpleHtml:SetText(LSHM:ToHTML(TwintopQOL.NewsContent or ""))
     simpleHtml:SetHeight(simpleHtml:GetContentHeight() + 10)
     scrollFrame:SetScrollChild(simpleHtml)
 end
@@ -102,15 +102,15 @@ local function CreateMainFrame()
         TwintopQOLSaved.news.enabled = self:GetChecked()
     end)
 
-    -- Override LibMarkdown inline color escapes for a cleaner palette
-    LMD.config["strong"]  = "|cffffcc00"
-    LMD.config["/strong"] = "|r"
-    LMD.config["em"]      = "|cffff9966"
-    LMD.config["/em"]     = "|r"
-    LMD.config["code"]    = "|cffaaaadd"
-    LMD.config["/code"]   = "|r"
-    LMD.config["pre"]     = "<p>|cffaaaadd"
-    LMD.config["/pre"]    = "|r</p><br />"
+    -- Override LibSimpleHTMLMarkdown inline color escapes for a cleaner palette
+    LSHM.config["strong"]  = "|cffffcc00"
+    LSHM.config["/strong"] = "|r"
+    LSHM.config["em"]      = "|cffff9966"
+    LSHM.config["/em"]     = "|r"
+    LSHM.config["code"]    = "|cffaaaadd"
+    LSHM.config["/code"]   = "|r"
+    LSHM.config["pre"]     = "<p>|cffaaaadd"
+    LSHM.config["/pre"]    = "|r</p><br />"
 
     BuildReader(frame)
 
