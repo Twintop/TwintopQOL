@@ -9,6 +9,43 @@ function TwintopQOL:Print(msg)
     print(string.format(L["ChatMessage"], msg))
 end
 
+local URL_POPUP = "TWINTOPQOL_URL"
+
+StaticPopupDialogs[URL_POPUP] = {
+    OnShow = function(self, data)
+        self:SetWidth(450)
+        self:SetFormattedText(L["UrlPopupText"], data.title)
+        self:GetEditBox():SetText(data.url)
+        self:GetEditBox():SetAutoFocus(true)
+        self:GetEditBox():HighlightText()
+    end,
+    OnAccept = function(self)
+        self:Hide()
+    end,
+    EditBoxOnEnterPressed = function(self)
+        self:GetParent():Hide()
+    end,
+    EditBoxOnEscapePressed = function(self)
+        self:GetParent():Hide()
+    end,
+    text = "",
+    button1 = L["OK"],
+    hasEditBox = true,
+    hasWideEditBox = true,
+    editBoxWidth = 400,
+    timeout = 60,
+    whileDead = true,
+    closeButton = true,
+    hideOnEscape = true
+}
+
+---Shows a popup with a URL selected and ready to copy.
+---@param title string
+---@param url string
+function TwintopQOL:ShowUrl(title, url)
+    StaticPopup_Show(URL_POPUP, nil, nil, { title = title, url = url })
+end
+
 -- Pretty-prints a table to chat. Handy for poking at Blizzard API return values.
 function TwintopQOL:TablePrint(T, indent)
     if not indent then
