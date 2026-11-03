@@ -60,12 +60,22 @@ local function GetSortField(key)
     return key
 end
 
+-- WoW Forever can have no active config, so fall back to the active dual spec
+-- group's config like its own talent frame does.
+local function GetActiveConfigId()
+    local configId = C_ClassTalents.GetActiveConfigID()
+    if configId == nil and TwintopQOL.IsForever then
+        configId = C_SpecializationInfo.GetCombatConfigIDForSpecGroup(C_SpecializationInfo.GetActiveSpecGroup())
+    end
+    return configId
+end
+
 -- Walk the active talent config and collect every node's spell, along with
 -- its entry/node/definition ids and rank info. A node is inactive when it is
 -- unranked or its sub-tree (hero talents) is inactive.
 local function GatherTalents()
     local result = {}
-    local configId = C_ClassTalents.GetActiveConfigID()
+    local configId = GetActiveConfigId()
     if configId == nil then
         return result, nil
     end
@@ -473,6 +483,8 @@ local function BuildPage(panel)
     -- Keep the page in sync when talents change while it's open
     panel:RegisterEvent("TRAIT_CONFIG_UPDATED")
     panel:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+    -- Dual spec swaps
+    panel:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
     panel:SetScript("OnEvent", function(self)
         if self:IsVisible() then
             Rescan()

@@ -2,6 +2,8 @@ local _, TwintopQOL = ...
 
 TwintopQOL = TwintopQOL or {}
 TwintopQOL.Data = TwintopQOL.Data or {}
+-- WoW Forever (internally "Camelot"). WOW_PROJECT_CAMELOT is nil on retail.
+TwintopQOL.IsForever = WOW_PROJECT_ID == WOW_PROJECT_CAMELOT
 
 local L = TwintopQOL.Localization
 

@@ -3,8 +3,9 @@
 	Smoke-loads the addon under the stubbed-API harness and fails on real errors.
 
 .DESCRIPTION
-	Runs build\harness\load.lua twice: once through the login events, and once more with
-	build\harness\drivers\pages.lua, which builds every main window page and runs every slash command.
+	Runs build\harness\load.lua three times: once through the login events; once with
+	build\harness\drivers\pages.lua, which builds every main window page and runs every slash command; and once with
+	build\harness\drivers\forever.lua, which loads the addon as the WoW Forever client.
 	ERROR, SYNTAX, EVENT ERROR, DRIVER ERROR, and FAIL lines fail the run; TIMER ERROR lines are counted only.
 	See build\harness\README.md.
 
@@ -28,7 +29,8 @@ if ($null -eq (Get-Command $Lua -ErrorAction SilentlyContinue)) {
 
 $runs = @(
 	[pscustomobject]@{ Name = "login"; Driver = "" },
-	[pscustomobject]@{ Name = "pages"; Driver = (Join-Path $scriptDir "harness\drivers\pages.lua") }
+	[pscustomobject]@{ Name = "pages"; Driver = (Join-Path $scriptDir "harness\drivers\pages.lua") },
+	[pscustomobject]@{ Name = "forever"; Driver = (Join-Path $scriptDir "harness\drivers\forever.lua") }
 )
 
 $failed = $false

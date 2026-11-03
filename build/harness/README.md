@@ -40,3 +40,4 @@ A driver is a Lua file returning hook functions, each called with a context tabl
 | Driver | Run by | What it does |
 | --- | --- | --- |
 | `drivers\pages.lua` | `smoke.ps1` | Builds every main window page, clicks the Jokes Configuration checkboxes, runs every slash command, and fires a boss wipe with wipe jokes on. Prints `PASS` and `FAIL` lines. |
+| `drivers\forever.lua` | `smoke.ps1` | Loads the addon as the WoW Forever client (`WOW_PROJECT_CAMELOT`): checks the Jokes content types are cut to the ones Forever has, the Talents page falls back to the dual spec group's config, and every page builds. Prints `PASS` and `FAIL` lines. |

@@ -552,6 +552,26 @@ TwintopQOL.Jokes.CONTENT_TYPES = {
     "arena"
 }
 
+-- WoW Forever only has Normal dungeons and raids, and no arenas.
+local NOT_IN_FOREVER = {
+    dungeonHeroic = true,
+    dungeonMythic = true,
+    mythicPlus = true,
+    delve = true,
+    scenario = true,
+    raidLFR = true,
+    raidHeroic = true,
+    raidMythic = true,
+    arena = true
+}
+if TwintopQOL.IsForever then
+    for i = #TwintopQOL.Jokes.CONTENT_TYPES, 1, -1 do
+        if NOT_IN_FOREVER[TwintopQOL.Jokes.CONTENT_TYPES[i]] then
+            table.remove(TwintopQOL.Jokes.CONTENT_TYPES, i)
+        end
+    end
+end
+
 -- Difficulty IDs that aren't Normal; anything unlisted counts as Normal.
 local DUNGEON_DIFFICULTIES = {
     [2] = "dungeonHeroic",
