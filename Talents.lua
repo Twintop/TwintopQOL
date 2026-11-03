@@ -1,5 +1,7 @@
 local _, TwintopQOL = ...
 
+local L = TwintopQOL.Localization
+
 ----------------------------------------------------------------------
 -- Constants
 ----------------------------------------------------------------------
@@ -12,15 +14,15 @@ local COLOR_INACTIVE = { 1, 0.2, 0.2 }
 -- sortKey (optional) sorts on a different field than the one displayed.
 local COLUMNS = {
     { key = "icon",         header = "",           width = 22,  align = "CENTER" },
-    { key = "name",         header = "Name",       width = 200, align = "LEFT" },
-    { key = "spellId",      header = "Spell ID",   width = 70,  align = "RIGHT" },
-    { key = "entryId",      header = "Entry ID",   width = 70,  align = "RIGHT" },
-    { key = "nodeId",       header = "Node ID",    width = 70,  align = "RIGHT" },
-    { key = "definitionId", header = "Def ID",     width = 70,  align = "RIGHT" },
-    { key = "iconId",       header = "Icon ID",    width = 70,  align = "RIGHT" },
-    { key = "treeId",       header = "Tree ID",    width = 60,  align = "RIGHT" },
-    { key = "ranks",        header = "Ranks",      width = 55,  align = "CENTER", sortKey = "currentRank" },
-    { key = "status",       header = "Status",     width = 70,  align = "CENTER", sortKey = "activeSort" },
+    { key = "name",         header = L["TalentsColumnName"],         width = 200, align = "LEFT" },
+    { key = "spellId",      header = L["TalentsColumnSpellId"],      width = 70,  align = "RIGHT" },
+    { key = "entryId",      header = L["TalentsColumnEntryId"],      width = 70,  align = "RIGHT" },
+    { key = "nodeId",       header = L["TalentsColumnNodeId"],       width = 70,  align = "RIGHT" },
+    { key = "definitionId", header = L["TalentsColumnDefinitionId"], width = 70,  align = "RIGHT" },
+    { key = "iconId",       header = L["TalentsColumnIconId"],       width = 70,  align = "RIGHT" },
+    { key = "treeId",       header = L["TalentsColumnTreeId"],       width = 60,  align = "RIGHT" },
+    { key = "ranks",        header = L["TalentsColumnRanks"],        width = 55,  align = "CENTER", sortKey = "currentRank" },
+    { key = "status",       header = L["TalentsColumnStatus"],       width = 70,  align = "CENTER", sortKey = "activeSort" },
 }
 
 ----------------------------------------------------------------------
@@ -101,17 +103,17 @@ local function GatherTalents()
                             result[#result + 1] = {
                                 order = #result + 1,
                                 iconId = spellInfo and spellInfo.originalIconID,
-                                name = spellInfo and spellInfo.name or "?",
+                                name = spellInfo and spellInfo.name or L["TalentsUnknownSpell"],
                                 spellId = spellId,
                                 entryId = entryId,
                                 nodeId = nodeId,
                                 definitionId = entryInfo.definitionID,
                                 treeId = treeId,
-                                ranks = node.currentRank .. "/" .. node.maxRanks,
+                                ranks = string.format(L["TalentsRanks"], node.currentRank, node.maxRanks),
                                 currentRank = node.currentRank,
                                 active = active,
                                 activeSort = active and 1 or 0,
-                                status = active and "Active" or "Inactive",
+                                status = active and L["TalentsStatusActive"] or L["TalentsStatusInactive"],
                             }
                         end
                     end
@@ -258,21 +260,21 @@ local function RefreshDisplay()
     for _, entry in ipairs(data) do
         if entry.active then active = active + 1 end
     end
-    rowCountLabel:SetText(#data .. " talents (" .. active .. " active)")
+    rowCountLabel:SetText(string.format(L["TalentsRowCount"], #data, active))
 end
 
 local function Rescan()
     local configId, configInfo
     data, configId, configInfo = GatherTalents()
     if frame then
-        local subtitle = ""
+        local title = L["TalentsPageTitle"]
         if configInfo and configInfo.name and configInfo.name ~= "" then
-            subtitle = " - " .. configInfo.name
+            title = string.format(L["TalentsTitleWithLoadout"], configInfo.name)
         end
         if configId then
-            subtitle = subtitle .. " |cFF888888(Config " .. configId .. ")|r"
+            title = string.format(L["TalentsTitleWithConfig"], title, configId)
         end
-        titleText:SetText("Talents" .. subtitle)
+        titleText:SetText(title)
     end
     RefreshDisplay()
 end
@@ -389,7 +391,7 @@ local function ShowExport()
 
         local title = exportFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
         title:SetPoint("TOP", 0, -10)
-        title:SetText("Export (Ctrl+A, Ctrl+C to copy)")
+        title:SetText(L["TalentsExportTitle"])
 
         local sf = CreateFrame("ScrollFrame", nil, exportFrame, "UIPanelScrollFrameTemplate")
         sf:SetPoint("TOPLEFT", 12, -34)
@@ -407,7 +409,7 @@ local function ShowExport()
         local closeBtn = CreateFrame("Button", nil, exportFrame, "UIPanelButtonTemplate")
         closeBtn:SetSize(80, 22)
         closeBtn:SetPoint("BOTTOM", 0, 10)
-        closeBtn:SetText("Close")
+        closeBtn:SetText(L["Close"])
         closeBtn:SetScript("OnClick", function() exportFrame:Hide() end)
     end
 
@@ -426,24 +428,24 @@ local function BuildPage(panel)
 
     titleText = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("TOPLEFT", 0, 0)
-    titleText:SetText("Talents")
+    titleText:SetText(L["TalentsPageTitle"])
 
     -- Bottom toolbar
     local refreshBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     refreshBtn:SetSize(70, 22)
     refreshBtn:SetPoint("BOTTOMLEFT", 0, 0)
-    refreshBtn:SetText("Refresh")
+    refreshBtn:SetText(L["TalentsRefresh"])
     refreshBtn:SetScript("OnClick", Rescan)
 
     local exportBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     exportBtn:SetSize(70, 22)
     exportBtn:SetPoint("LEFT", refreshBtn, "RIGHT", 6, 0)
-    exportBtn:SetText("Export")
+    exportBtn:SetText(L["TalentsExport"])
     exportBtn:SetScript("OnClick", ShowExport)
 
     local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     hint:SetPoint("LEFT", exportBtn, "RIGHT", 10, 0)
-    hint:SetText("Shift-click a row to link the spell")
+    hint:SetText(L["TalentsShiftClickHint"])
 
     rowCountLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     rowCountLabel:SetPoint("BOTTOMRIGHT", -4, 6)
@@ -478,4 +480,4 @@ local function BuildPage(panel)
     end)
 end
 
-TwintopQOL.Window:RegisterPage("talents", "Talents", BuildPage)
+TwintopQOL.Window:RegisterPage("talents", L["TalentsPageTitle"], BuildPage)

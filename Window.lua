@@ -1,6 +1,8 @@
 local addonName, TwintopQOL = ...
 TwintopQOL.Window = TwintopQOL.Window or {}
 
+local L = TwintopQOL.Localization
+
 local ADDON_VERSION = C_AddOns.GetAddOnMetadata(addonName, "Version") .. "-" .. C_AddOns.GetAddOnMetadata(addonName, "X-ReleaseType")
 
 local FRAME_WIDTH = 1000
@@ -110,7 +112,7 @@ local function CreateMainFrame()
 
     local titleText = titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("LEFT", 8, 0)
-    titleText:SetText("Twintop QOL")
+    titleText:SetText(L["TwintopQOL"])
 
     local closeX = CreateFrame("Button", nil, titleBar, "UIPanelCloseButton")
     closeX:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -2, -2)
@@ -174,7 +176,7 @@ local function CreateMainFrame()
     newsHighlight:SetColorTexture(1, 1, 1, 0.1)
     local newsText = newsBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     newsText:SetPoint("CENTER")
-    newsText:SetText("News")
+    newsText:SetText(L["FooterNews"])
     newsBtn:SetScript("OnClick", function() TwintopQOL.News:Show() end)
 
     contentArea = CreateFrame("Frame", nil, frame)

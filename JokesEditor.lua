@@ -1,5 +1,7 @@
 local _, TwintopQOL = ...
 
+local L = TwintopQOL.Localization
+
 -- Chat messages longer than this can't be sent.
 local MAX_CHAT_LENGTH = 255
 local RESET_POPUP = "TWINTOPQOL_JOKES_RESET"
@@ -46,10 +48,9 @@ end
 
 local function UpdateStatus()
     local count = #ParseJokes(editBox:GetText())
-    local source = TwintopQOL.Jokes:IsCustom() and "custom list" or "default list"
-    local status = string.format("%d jokes (saved: %s)", count, source)
+    local status = string.format(TwintopQOL.Jokes:IsCustom() and L["JokesStatusCustom"] or L["JokesStatusDefault"], count)
     if dirty then
-        status = status .. "  |cFFFF8000Unsaved changes|r"
+        status = string.format(L["JokesStatusUnsaved"], status)
     end
     statusText:SetText(status)
 end
@@ -161,9 +162,9 @@ local function SaveJokes()
         end
     end
 
-    TwintopQOL:Print(string.format("Saved %d jokes.", #list))
+    TwintopQOL:Print(string.format(L["JokesSaved"], #list))
     if tooLong > 0 then
-        TwintopQOL:Print(string.format("|cFFFF8000Warning:|r %d jokes are longer than %d characters and can't be sent in chat.", tooLong, MAX_CHAT_LENGTH))
+        TwintopQOL:Print(string.format(L["JokesTooLongWarning"], tooLong, MAX_CHAT_LENGTH))
     end
 end
 
@@ -294,17 +295,13 @@ end
 local function BuildPage(panel)
     local titleText = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("TOPLEFT", 0, 0)
-    titleText:SetText("Jokes")
+    titleText:SetText(L["JokesPageTitle"])
 
     local instructions = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     instructions:SetPoint("TOPLEFT", 0, -26)
     instructions:SetPoint("TOPRIGHT", 0, -26)
     instructions:SetJustifyH("LEFT")
-    instructions:SetText(string.format(
-        "Enter |cFFFFCC00one joke per line|r. Blank lines are removed when you save. Click |cFFFFCC00Save|r to keep your changes; "
-        .. "closing the window without saving discards them. Jokes longer than %d characters can't be sent in chat. "
-        .. "Hold Shift and use the mouse wheel to scroll sideways.",
-        MAX_CHAT_LENGTH))
+    instructions:SetText(string.format(L["JokesInstructions"], MAX_CHAT_LENGTH))
 
     BuildEditor(panel)
 
@@ -314,23 +311,23 @@ local function BuildPage(panel)
     local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     resetBtn:SetSize(140, 22)
     resetBtn:SetPoint("BOTTOMRIGHT", 0, 0)
-    resetBtn:SetText("Reset to Defaults")
+    resetBtn:SetText(L["JokesResetToDefaults"])
     resetBtn:SetScript("OnClick", function() StaticPopup_Show(RESET_POPUP) end)
 
     local saveBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     saveBtn:SetSize(100, 22)
     saveBtn:SetPoint("RIGHT", resetBtn, "LEFT", -6, 0)
-    saveBtn:SetText("Save")
+    saveBtn:SetText(L["JokesSave"])
     saveBtn:SetScript("OnClick", SaveJokes)
 
     StaticPopupDialogs[RESET_POPUP] = {
-        text = "Reset your joke list to the defaults? Your custom jokes will be lost.",
-        button1 = YES,
-        button2 = NO,
+        text = L["JokesResetConfirm"],
+        button1 = L["Yes"],
+        button2 = L["No"],
         OnAccept = function()
             TwintopQOL.Jokes:SetList(TwintopQOL.Jokes:GetDefaults())
             LoadJokes()
-            TwintopQOL:Print("Joke list reset to the defaults.")
+            TwintopQOL:Print(L["JokesResetDone"])
         end,
         timeout = 0,
         whileDead = true,
@@ -350,4 +347,4 @@ local function BuildPage(panel)
     end)
 end
 
-TwintopQOL.Window:RegisterPage("jokes", "Jokes", BuildPage)
+TwintopQOL.Window:RegisterPage("jokes", L["JokesPageTitle"], BuildPage)
