@@ -1,10 +1,10 @@
 local addonName, TwintopQOL = ...
 TwintopQOL.News = TwintopQOL.News or {}
 
+local L = TwintopQOL.Localization
 local LSHM = LibStub("LibSimpleHTMLMarkdown-1.0")
 
 local ADDON_VERSION = C_AddOns.GetAddOnMetadata(addonName, "Version") .. "-" .. C_AddOns.GetAddOnMetadata(addonName, "X-ReleaseType")
-local ISSUE_URL = "https://github.com/Twintop/TwintopQOL/issues/"
 local URL_POPUP = "TWINTOPQOL_NEWS_URL"
 
 local frame
@@ -18,8 +18,8 @@ local function OnHyperlinkClick(_, link, text)
     elseif link:match("https?://") then
         StaticPopup_Show(URL_POPUP, nil, nil, { title = text, url = link })
     elseif link:match("^#%d+$") then
-        local url = ISSUE_URL .. link:sub(2)
-        StaticPopup_Show(URL_POPUP, nil, nil, { title = "issue " .. link .. " on GitHub", url = url })
+        local url = L["GitHubIssuesUrl"] .. link:sub(2)
+        StaticPopup_Show(URL_POPUP, nil, nil, { title = string.format(L["NewsHyperlinkIssueOnGitHub"], link), url = url })
     end
 end
 
@@ -81,7 +81,7 @@ local function CreateMainFrame()
 
     local titleText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("TOPLEFT", 14, -10)
-    titleText:SetText("Twintop QOL Updates")
+    titleText:SetText(L["NewsHeader"])
 
     local closeX = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
     closeX:SetPoint("TOPRIGHT", -2, -2)
@@ -90,13 +90,13 @@ local function CreateMainFrame()
     local closeBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     closeBtn:SetSize(100, 22)
     closeBtn:SetPoint("BOTTOMRIGHT", -10, 8)
-    closeBtn:SetText("Close")
+    closeBtn:SetText(L["Close"])
     closeBtn:SetScript("OnClick", function() TwintopQOL.News:Hide() end)
 
     local showAgain = CreateFrame("CheckButton", "TwintopQOLNewsShowAgain", frame, "ChatConfigCheckButtonTemplate")
     showAgain:SetPoint("BOTTOMLEFT", 8, 6)
-    _G[showAgain:GetName() .. "Text"]:SetText("Show on new version release")
-    showAgain.tooltip = "Show this update popup whenever a new version of Twintop QOL is released."
+    _G[showAgain:GetName() .. "Text"]:SetText(L["NewsCheckboxShowOnNewVersion"])
+    showAgain.tooltip = L["NewsCheckboxShowOnNewVersionTooltip"]
     showAgain:SetChecked(TwintopQOLSaved.news.enabled)
     showAgain:SetScript("OnClick", function(self)
         TwintopQOLSaved.news.enabled = self:GetChecked()
@@ -118,7 +118,7 @@ local function CreateMainFrame()
     StaticPopupDialogs[URL_POPUP] = {
         OnShow = function(self, data)
             self:SetWidth(450)
-            self:SetFormattedText("Here's a link to %s", data.title)
+            self:SetFormattedText(L["UrlPopupText"], data.title)
             self:GetEditBox():SetText(data.url)
             self:GetEditBox():SetAutoFocus(true)
             self:GetEditBox():HighlightText()
@@ -133,7 +133,7 @@ local function CreateMainFrame()
             self:GetParent():Hide()
         end,
         text = "",
-        button1 = OKAY,
+        button1 = L["OK"],
         hasEditBox = true,
         hasWideEditBox = true,
         editBoxWidth = 400,

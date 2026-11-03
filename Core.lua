@@ -3,11 +3,10 @@ local _, TwintopQOL = ...
 TwintopQOL = TwintopQOL or {}
 TwintopQOL.Data = TwintopQOL.Data or {}
 
--- Colored chat prefix used for all addon output.
-local PREFIX = "|cFF00CCFFTQOL:|r "
+local L = TwintopQOL.Localization
 
 function TwintopQOL:Print(msg)
-    print(PREFIX .. msg)
+    print(string.format(L["ChatMessage"], msg))
 end
 
 -- Pretty-prints a table to chat. Handy for poking at Blizzard API return values.
@@ -59,7 +58,7 @@ function TwintopQOL:ParseCmdString(msg)
 end
 
 local function PrintHelp()
-    TwintopQOL:Print("Commands: |cFFFFFF00/tqol|r (open the Twintop QOL window), |cFFFFFF00joke|r (tell a joke now), |cFFFFFF00jokes|r (edit the joke list), |cFFFFFF00silly|r {on|off} (ready-check \"Yes chef!\" + wipe jokes), |cFFFFFF00talents|r / |cFFFFFF00df|r (talent list), |cFFFFFF00news|r (toggle news window), |cFFFFFF00help|r (this list).")
+    TwintopQOL:Print(L["SlashHelp"])
 end
 
 SLASH_TWINTOPQOL1 = "/tqol"
@@ -78,13 +77,13 @@ SlashCmdList.TWINTOPQOL = function(msg)
         if toggle == "on" then
             TwintopQOL.Silly:Enable()
             TwintopQOLSaved.sillyEnabled = true
-            TwintopQOL:Print("Silly mode |cFF00FF00enabled|r.")
+            TwintopQOL:Print(L["SillyModeEnabled"])
         elseif toggle == "off" then
             TwintopQOL.Silly:Disable()
             TwintopQOLSaved.sillyEnabled = false
-            TwintopQOL:Print("Silly mode |cFFFF0000disabled|r.")
+            TwintopQOL:Print(L["SillyModeDisabled"])
         else
-            TwintopQOL:Print("Usage: /tqol silly {on|off}")
+            TwintopQOL:Print(L["SillyModeUsage"])
         end
     elseif cmd == "talents" or cmd == "df" then
         TwintopQOL.Window:Toggle("talents")

@@ -1,11 +1,13 @@
 local _, TwintopQOL = ...
 TwintopQOL.Silly = TwintopQOL.Silly or {}
 
+local L = TwintopQOL.Localization
+
 local function SillyEventHandler(self, event, ...)
     if event == "READY_CHECK_CONFIRM" then
         local player, ready = ...
         if ready and player == "player" then
-            C_ChatInfo.SendChatMessage("Yes chef!", "SAY")
+            C_ChatInfo.SendChatMessage(L["SillyReadyCheckResponse"], "SAY")
         end
     elseif event == "ENCOUNTER_END" then
         local _, _, _, _, success = ...
