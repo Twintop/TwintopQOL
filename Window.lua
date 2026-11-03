@@ -14,6 +14,9 @@ local NAV_BUTTON_HEIGHT = 22
 local NAV_BUTTON_PAD = 2
 local NAV_INDENT = 20
 local CONTENT_PADDING = 10
+local FOOTER_BUTTON_WIDTH = 120
+local ICON_PATH = "Interface\\AddOns\\TwintopQOL\\Images\\"
+local BLURPLE = { 0.345, 0.396, 0.949 }
 
 local frame
 local navFrame
@@ -100,6 +103,49 @@ local function RefreshNav()
             end
         end
     end
+end
+
+---Creates a footer button with an icon, a 1px border, and a hover tint.
+---@param parent Frame
+---@param label string
+---@param iconPath string
+---@param background number Gray level of the button background.
+---@param border number[]|nil RGB border and hover tint; gray when nil.
+---@param onClick function
+---@return Button
+local function CreateFooterButton(parent, label, iconPath, background, border, onClick)
+    local btn = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    btn:SetSize(FOOTER_BUTTON_WIDTH, 20)
+    btn:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    })
+    btn:SetBackdropColor(background, background, background, 1)
+    btn:RegisterForClicks("AnyUp")
+
+    local highlight = btn:CreateTexture(nil, "HIGHLIGHT")
+    highlight:SetAllPoints()
+    if border then
+        btn:SetBackdropBorderColor(border[1], border[2], border[3], 1)
+        highlight:SetColorTexture(border[1], border[2], border[3], 0.15)
+    else
+        btn:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+        highlight:SetColorTexture(1, 1, 1, 0.1)
+    end
+
+    local icon = btn:CreateTexture(nil, "ARTWORK")
+    icon:SetSize(14, 14)
+    icon:SetPoint("LEFT", 8, 0)
+    icon:SetTexture(iconPath)
+
+    local text = btn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    text:SetPoint("CENTER", 8, 0)
+    text:SetText(label)
+
+    btn:SetScript("OnClick", onClick)
+    return btn
 end
 
 ---Shows a page, building its panel on first use.
@@ -211,24 +257,26 @@ local function CreateMainFrame()
     versionText:SetTextColor(0.6, 0.6, 0.6, 1)
     versionText:SetText(ADDON_VERSION)
 
-    local newsBtn = CreateFrame("Button", nil, footer, "BackdropTemplate")
-    newsBtn:SetSize(100, 20)
-    newsBtn:SetPoint("RIGHT", -4, 0)
-    newsBtn:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        edgeSize = 1,
-        insets = { left = 1, right = 1, top = 1, bottom = 1 }
-    })
-    newsBtn:SetBackdropColor(0.1, 0.1, 0.1, 1)
-    newsBtn:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-    local newsHighlight = newsBtn:CreateTexture(nil, "HIGHLIGHT")
-    newsHighlight:SetAllPoints()
-    newsHighlight:SetColorTexture(1, 1, 1, 0.1)
-    local newsText = newsBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    newsText:SetPoint("CENTER")
-    newsText:SetText(L["FooterNews"])
-    newsBtn:SetScript("OnClick", function() TwintopQOL.News:Show() end)
+    -- Right to left, matching TwintopInsanityBar's footer.
+    local discordBtn = CreateFooterButton(footer, L["FooterDiscord"], ICON_PATH .. "discord64.png", 0, BLURPLE, function()
+        TwintopQOL:ShowUrl(L["FooterDiscord"], L["FooterDiscordUrl"])
+    end)
+    discordBtn:SetPoint("RIGHT", -4, 0)
+
+    local kofiBtn = CreateFooterButton(footer, L["FooterKofi"], ICON_PATH .. "kofi.png", 0, nil, function()
+        TwintopQOL:ShowUrl(L["FooterKofi"], L["FooterKofiUrl"])
+    end)
+    kofiBtn:SetPoint("RIGHT", discordBtn, "LEFT", -6, 0)
+
+    local githubBtn = CreateFooterButton(footer, L["FooterGitHubIssues"], ICON_PATH .. "GitHub_Invertocat_White64.png", 0, nil, function()
+        TwintopQOL:ShowUrl(L["FooterGitHubIssues"], L["GitHubIssuesUrl"])
+    end)
+    githubBtn:SetPoint("RIGHT", kofiBtn, "LEFT", -6, 0)
+
+    local newsBtn = CreateFooterButton(footer, L["FooterNews"], ICON_PATH .. "newspaper.png", 0.1, nil, function()
+        TwintopQOL.News:Show()
+    end)
+    newsBtn:SetPoint("RIGHT", githubBtn, "LEFT", -6, 0)
 
     contentArea = CreateFrame("Frame", nil, frame)
     contentArea:SetPoint("TOPLEFT", navFrame, "TOPRIGHT", 1, 0)
