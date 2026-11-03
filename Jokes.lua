@@ -1,7 +1,10 @@
 local _, TwintopQOL = ...
 TwintopQOL.Jokes = TwintopQOL.Jokes or {}
 
-local jokeList = {
+-- Shipped joke list. Seeds a new install, and is what "Reset to Defaults" restores.
+-- Players who never customize their list always use this (so they pick up new
+-- jokes in addon updates); a custom list is stored in TwintopQOLSaved.jokes.
+local DEFAULT_JOKES = {
     "What do ducks like on their tacos? Quackamole and Beako de Gallo",
     "I don't like German sausages. They are the wurst",
     "Which vegetable do you stand in line for? A queue cumber.",
@@ -529,22 +532,38 @@ local function HashJoke(text)
     return h
 end
 
--- Precompute hashes once per load (the list is static for the session).
-local jokeHashes = {}
-for i = 1, #jokeList do
-    jokeHashes[i] = HashJoke(jokeList[i])
+-- Hashes for the active list, rebuilt whenever the list changes.
+local jokeHashes
+
+---Returns the active joke list: the player's custom list, or the defaults.
+---@return string[]
+local function GetActiveList()
+    return (TwintopQOLSaved and TwintopQOLSaved.jokes) or DEFAULT_JOKES
+end
+
+local function GetHashes()
+    if not jokeHashes then
+        jokeHashes = {}
+        local list = GetActiveList()
+        for i = 1, #list do
+            jokeHashes[i] = HashJoke(list[i])
+        end
+    end
+    return jokeHashes
 end
 
 -- Pick a joke we haven't used yet this cycle. When every (unique) joke has been
 -- seen, the cycle resets. State persists across sessions via TwintopQOLSaved.
 local function PickJoke()
+    local jokeList = GetActiveList()
     TwintopQOLSaved = TwintopQOLSaved or {}
     TwintopQOLSaved.seen = TwintopQOLSaved.seen or {}
     local seen = TwintopQOLSaved.seen
+    local hashes = GetHashes()
 
     local pool = {}
     for i = 1, #jokeList do
-        if not seen[jokeHashes[i]] then
+        if not seen[hashes[i]] then
             pool[#pool + 1] = i
         end
     end
@@ -558,12 +577,52 @@ local function PickJoke()
     end
 
     local index = pool[fastrandom(1, #pool)]
-    seen[jokeHashes[index]] = true
+    seen[hashes[index]] = true
     return jokeList[index]
+end
+
+---Returns a copy of the shipped default jokes.
+---@return string[]
+function TwintopQOL.Jokes:GetDefaults()
+    return CopyTable(DEFAULT_JOKES)
+end
+
+---Returns a copy of the active joke list.
+---@return string[]
+function TwintopQOL.Jokes:GetList()
+    return CopyTable(GetActiveList())
+end
+
+---Replaces the active joke list. A list identical to the defaults clears the
+---custom list, so the player goes back to tracking the shipped defaults.
+---@param list string[]
+function TwintopQOL.Jokes:SetList(list)
+    local isDefault = #list == #DEFAULT_JOKES
+    if isDefault then
+        for i = 1, #list do
+            if list[i] ~= DEFAULT_JOKES[i] then
+                isDefault = false
+                break
+            end
+        end
+    end
+
+    TwintopQOLSaved.jokes = (not isDefault) and CopyTable(list) or nil
+    jokeHashes = nil
+end
+
+---Whether the player is using a custom joke list.
+---@return boolean
+function TwintopQOL.Jokes:IsCustom()
+    return TwintopQOLSaved.jokes ~= nil
 end
 
 -- Send a joke to the most appropriate group chat channel.
 function TwintopQOL.Jokes:Send()
+    if #GetActiveList() == 0 then
+        return
+    end
+
     if IsInRaid() then
         C_ChatInfo.SendChatMessage(PickJoke(), "RAID")
     elseif IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then

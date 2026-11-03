@@ -59,7 +59,7 @@ function TwintopQOL:ParseCmdString(msg)
 end
 
 local function PrintHelp()
-    TwintopQOL:Print("Commands: |cFFFFFF00joke|r (tell a joke now), |cFFFFFF00silly|r {on|off} (ready-check \"Yes chef!\" + wipe jokes), |cFFFFFF00talents|r / |cFFFFFF00df|r (toggle talent window), |cFFFFFF00news|r (toggle news window).")
+    TwintopQOL:Print("Commands: |cFFFFFF00/tqol|r (open the Twintop QOL window), |cFFFFFF00joke|r (tell a joke now), |cFFFFFF00jokes|r (edit the joke list), |cFFFFFF00silly|r {on|off} (ready-check \"Yes chef!\" + wipe jokes), |cFFFFFF00talents|r / |cFFFFFF00df|r (talent list), |cFFFFFF00news|r (toggle news window), |cFFFFFF00help|r (this list).")
 end
 
 SLASH_TWINTOPQOL1 = "/tqol"
@@ -67,8 +67,12 @@ SLASH_TWINTOPQOL2 = "/twintopqol"
 SlashCmdList.TWINTOPQOL = function(msg)
     local cmd, subcmd = TwintopQOL:ParseCmdString(msg)
 
-    if cmd == "joke" then
+    if cmd == "" then
+        TwintopQOL.Window:Toggle()
+    elseif cmd == "joke" then
         TwintopQOL.Jokes:Send()
+    elseif cmd == "jokes" then
+        TwintopQOL.Window:Toggle("jokes")
     elseif cmd == "silly" then
         local toggle = TwintopQOL:ParseCmdString(subcmd)
         if toggle == "on" then
@@ -83,7 +87,7 @@ SlashCmdList.TWINTOPQOL = function(msg)
             TwintopQOL:Print("Usage: /tqol silly {on|off}")
         end
     elseif cmd == "talents" or cmd == "df" then
-        TwintopQOL.Talents:Toggle()
+        TwintopQOL.Window:Toggle("talents")
     elseif cmd == "news" then
         TwintopQOL.News:Toggle()
     else

@@ -14,7 +14,9 @@ Libs\LibStub.lua
 Libs\LibMarkdown\LibMarkdown.xml
 
 Core.lua
+Window.lua
 Jokes.lua
+JokesEditor.lua
 Silly.lua
 Talents.lua
 NewsContent.lua

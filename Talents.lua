@@ -1,10 +1,8 @@
 local _, TwintopQOL = ...
-TwintopQOL.Talents = TwintopQOL.Talents or {}
 
 ----------------------------------------------------------------------
 -- Constants
 ----------------------------------------------------------------------
-local WINDOW_HEIGHT = 480
 local ROW_HEIGHT = 18
 local HEADER_HEIGHT = 22
 local COLOR_ACTIVE = { 0.2, 0.9, 0.2 }
@@ -29,6 +27,8 @@ local COLUMNS = {
 -- State
 ----------------------------------------------------------------------
 local frame
+local titleText
+local rowCountLabel
 local scrollFrame
 local scrollChild
 local exportFrame
@@ -220,7 +220,7 @@ end
 -- Refresh display
 ----------------------------------------------------------------------
 local function RefreshDisplay()
-    if not frame or not frame:IsShown() then return end
+    if not frame or not frame:IsVisible() then return end
 
     local sorted = SortData(data, GetSortField(sortColumn), sortAscending)
     EnsureRows(#sorted)
@@ -258,7 +258,7 @@ local function RefreshDisplay()
     for _, entry in ipairs(data) do
         if entry.active then active = active + 1 end
     end
-    frame.rowCountLabel:SetText(#data .. " talents (" .. active .. " active)")
+    rowCountLabel:SetText(#data .. " talents (" .. active .. " active)")
 end
 
 local function Rescan()
@@ -272,7 +272,7 @@ local function Rescan()
         if configId then
             subtitle = subtitle .. " |cFF888888(Config " .. configId .. ")|r"
         end
-        frame.titleText:SetText("Talents" .. subtitle)
+        titleText:SetText("Talents" .. subtitle)
     end
     RefreshDisplay()
 end
@@ -417,130 +417,65 @@ local function ShowExport()
 end
 
 ----------------------------------------------------------------------
--- Build main frame
+-- Build page
 ----------------------------------------------------------------------
-local function CreateMainFrame()
-    if frame then return end
+---Fills the Talents page of the main window.
+---@param panel Frame
+local function BuildPage(panel)
+    frame = panel
 
-    local width = GetTotalColumnWidth() + 20 + 22 -- side padding + vertical scrollbar
-
-    frame = CreateFrame("Frame", "TwintopQOLTalentsWindow", UIParent, "BackdropTemplate")
-    frame:SetSize(width, WINDOW_HEIGHT)
-    frame:SetPoint("CENTER")
-    frame:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 32, edgeSize = 16,
-        insets = { left = 4, right = 4, top = 4, bottom = 4 }
-    })
-    frame:SetFrameStrata("HIGH")
-    frame:SetMovable(true)
-    frame:SetResizable(true)
-    frame:EnableMouse(true)
-    frame:SetResizeBounds(width, 250, width, 1200)
-    frame:SetClampedToScreen(true)
-    tinsert(UISpecialFrames, "TwintopQOLTalentsWindow") -- ESC to close
-
-    -- Title bar drag region
-    local titleBar = CreateFrame("Frame", nil, frame)
-    titleBar:SetHeight(28)
-    titleBar:SetPoint("TOPLEFT", 0, 0)
-    titleBar:SetPoint("TOPRIGHT", 0, 0)
-    titleBar:EnableMouse(true)
-    titleBar:RegisterForDrag("LeftButton")
-    titleBar:SetScript("OnDragStart", function() frame:StartMoving() end)
-    titleBar:SetScript("OnDragStop", function() frame:StopMovingOrSizing() end)
-
-    local titleText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    titleText:SetPoint("TOPLEFT", 14, -10)
+    titleText = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    titleText:SetPoint("TOPLEFT", 0, 0)
     titleText:SetText("Talents")
-    frame.titleText = titleText
-
-    local closeBtn = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
-    closeBtn:SetPoint("TOPRIGHT", -2, -2)
-    closeBtn:SetScript("OnClick", function() frame:Hide() end)
-
-    -- Resize grip (bottom-right, height only)
-    local resizeBtn = CreateFrame("Button", nil, frame)
-    resizeBtn:SetSize(16, 16)
-    resizeBtn:SetPoint("BOTTOMRIGHT", -4, 4)
-    resizeBtn:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-    resizeBtn:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
-    resizeBtn:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
-    resizeBtn:SetScript("OnMouseDown", function(_, button)
-        if button == "LeftButton" then
-            frame:StartSizing("BOTTOMRIGHT")
-        end
-    end)
-    resizeBtn:SetScript("OnMouseUp", function()
-        frame:StopMovingOrSizing()
-    end)
 
     -- Bottom toolbar
-    local refreshBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    local refreshBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     refreshBtn:SetSize(70, 22)
-    refreshBtn:SetPoint("BOTTOMLEFT", 10, 8)
+    refreshBtn:SetPoint("BOTTOMLEFT", 0, 0)
     refreshBtn:SetText("Refresh")
     refreshBtn:SetScript("OnClick", Rescan)
 
-    local exportBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    local exportBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     exportBtn:SetSize(70, 22)
     exportBtn:SetPoint("LEFT", refreshBtn, "RIGHT", 6, 0)
     exportBtn:SetText("Export")
     exportBtn:SetScript("OnClick", ShowExport)
 
-    local hint = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     hint:SetPoint("LEFT", exportBtn, "RIGHT", 10, 0)
     hint:SetText("Shift-click a row to link the spell")
 
-    local rowCountLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    rowCountLabel:SetPoint("BOTTOMRIGHT", -24, 14)
+    rowCountLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    rowCountLabel:SetPoint("BOTTOMRIGHT", -4, 6)
     rowCountLabel:SetJustifyH("RIGHT")
-    frame.rowCountLabel = rowCountLabel
 
     -- Header
-    local header = CreateFrame("Frame", nil, frame)
+    local header = CreateFrame("Frame", nil, panel)
     header:SetHeight(HEADER_HEIGHT)
-    header:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -32)
-    header:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
+    header:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, -28)
+    header:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
     CreateHeaders(header)
 
     -- Vertical scroll frame below header
-    scrollFrame = CreateFrame("ScrollFrame", "TwintopQOLTalentsScrollFrame", frame, "UIPanelScrollFrameTemplate")
+    scrollFrame = CreateFrame("ScrollFrame", "TwintopQOLTalentsScrollFrame", panel, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, 0)
-    scrollFrame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -32, 38)
+    scrollFrame:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -26, 30)
 
     scrollChild = CreateFrame("Frame", nil, scrollFrame)
     scrollChild:SetWidth(GetTotalColumnWidth())
     scrollChild:SetHeight(1)
     scrollFrame:SetScrollChild(scrollChild)
 
-    -- Keep the window in sync when talents change while it's open
-    frame:RegisterEvent("TRAIT_CONFIG_UPDATED")
-    frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-    frame:SetScript("OnEvent", function(self)
-        if self:IsShown() then
+    panel:SetScript("OnShow", Rescan)
+
+    -- Keep the page in sync when talents change while it's open
+    panel:RegisterEvent("TRAIT_CONFIG_UPDATED")
+    panel:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+    panel:SetScript("OnEvent", function(self)
+        if self:IsVisible() then
             Rescan()
         end
     end)
 end
 
-----------------------------------------------------------------------
--- Public API
-----------------------------------------------------------------------
-
----Shows the talent window, creating it if necessary, and rescans talents.
-function TwintopQOL.Talents:Show()
-    CreateMainFrame()
-    frame:Show()
-    Rescan()
-end
-
----Toggles the talent window.
-function TwintopQOL.Talents:Toggle()
-    if frame and frame:IsShown() then
-        frame:Hide()
-    else
-        self:Show()
-    end
-end
+TwintopQOL.Window:RegisterPage("talents", "Talents", BuildPage)

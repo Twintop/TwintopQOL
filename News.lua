@@ -159,6 +159,7 @@ function TwintopQOL.News:Show()
     CreateMainFrame()
     TwintopQOLSaved.news.lastUpdate = ADDON_VERSION
     frame:Show()
+    frame:Raise()
 end
 
 ---Toggles the news window.
