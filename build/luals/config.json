@@ -1,0 +1,41 @@
+{
+    "runtime": {
+        "version": "Lua 5.1",
+        "builtin": {
+            "basic": "disable",
+            "debug": "disable",
+            "io": "disable",
+            "math": "disable",
+            "os": "disable",
+            "package": "disable",
+            "string": "disable",
+            "table": "disable",
+            "utf8": "disable"
+        }
+    },
+    "diagnostics": {
+        "globals": [
+            "SlashCmdList",
+            "LE_PARTY_CATEGORY_INSTANCE",
+            "UISpecialFrames",
+            "ChatEdit_InsertLink",
+            "ChatFrameUtil",
+            "StaticPopupDialogs",
+            "StaticPopup_Show",
+            "OKAY",
+            "ScrollingEdit_OnCursorChanged",
+            "YES",
+            "NO",
+            "ScrollingEdit_OnUpdate",
+            "CLOSE"
+        ]
+    },
+    "type": {
+        "weakUnionCheck": true
+    },
+    "workspace": {
+        "ignoreDir": [
+            "Libs"
+        ]
+    }
+}
