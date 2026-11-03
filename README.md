@@ -13,7 +13,8 @@ A grab-bag of quality-of-life (and silly) things for World of Warcraft. Tell you
 
 - Type `/tqol joke` to tell a joke in your group's chat: raid, instance, or party, whichever fits. Nothing is sent when you're not in a group.
 - Ships with over 500 jokes, from groan-worthy puns to a few written just for WoW players.
-- Jokes don't repeat until every joke on your list has been told, even across sessions.
+- Wipe jokes: after a boss wipe, tells your group a joke to lighten the mood. Turn them on in the Jokes Configuration page, and choose which content they play in: open world, each dungeon and raid difficulty, Mythic+, delves, scenarios, battlegrounds, and arenas.
+- By default, jokes don't repeat until every joke on your list has been told, even across sessions. Uncheck it in Configuration for pure random picks.
 
 ### Joke Editor
 
@@ -27,7 +28,6 @@ A grab-bag of quality-of-life (and silly) things for World of Warcraft. Tell you
 Turn it on with `/tqol silly on` for a little extra personality in group content. It stays on until you turn it off.
 
 - Answering "ready" to a ready check says "Yes chef!" in `/say`.
-- After a boss wipe, tells your group a joke to lighten the mood.
 
 ### Talents
 
