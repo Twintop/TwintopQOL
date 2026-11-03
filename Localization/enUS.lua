@@ -5,11 +5,6 @@ local L = TwintopQOL.Localization
 L["TwintopQOL"] = "Twintop QOL"
 L["ChatMessage"] = "|cFF00CCFFTQOL:|r %s"
 
--- Core.lua
-L["SillyModeEnabled"] = "Silly mode |cFF00FF00enabled|r."
-L["SillyModeDisabled"] = "Silly mode |cFFFF0000disabled|r."
-L["SillyModeUsage"] = "Usage: /tqol silly {on|off}"
-
 -- Window.lua
 L["FooterNews"] = "News"
 
@@ -20,7 +15,7 @@ L["NewsCheckboxShowOnNewVersionTooltip"] = "Show this update popup whenever a ne
 L["NewsHyperlinkIssueOnGitHub"] = "issue %s on GitHub"
 L["UrlPopupText"] = "Here's a link to %s"
 
--- Silly.lua
+-- ReadyCheck.lua
 L["SillyReadyCheckResponse"] = "Yes chef!"
 
 -- JokesEditor.lua
@@ -82,7 +77,6 @@ L["JokesContentArena"] = "Arena"
 L["JokesBehaviorHeader"] = "Joke selection"
 L["JokesNoRepeats"] = "Tell every joke before repeating any"
 L["JokesNoRepeatsTooltip"] = "When checked, every joke is told once before any joke repeats. When unchecked, each joke is picked at random from the whole list."
-L["SlashHelp"] = "Commands: |cFFFFFF00/tqol|r (open the Twintop QOL window), |cFFFFFF00joke|r (tell a joke now), |cFFFFFF00jokes|r (edit the joke list), |cFFFFFF00silly|r {on|off} (ready-check \"Yes chef!\"), |cFFFFFF00talents|r / |cFFFFFF00df|r (talent list), |cFFFFFF00news|r (toggle news window), |cFFFFFF00help|r (this list)."
 L["AboutPageTitle"] = "About Twintop QOL"
 L["AboutAuthor"] = "Author:"
 L["AboutAuthorServer"] = "%s - %s"
@@ -92,3 +86,8 @@ L["AboutLocalization"] = "Localization:"
 L["FooterDiscord"] = "Discord"
 L["FooterGitHubIssues"] = "GitHub Issues"
 L["FooterKofi"] = "Donate on Ko-fi"
+L["SlashHelp"] = "Commands: |cFFFFFF00/tqol|r (open the Twintop QOL window), |cFFFFFF00joke|r (tell a joke now), |cFFFFFF00jokes|r (edit the joke list), |cFFFFFF00talents|r / |cFFFFFF00df|r (talent list), |cFFFFFF00news|r (toggle news window), |cFFFFFF00help|r (this list)."
+L["GeneralPageTitle"] = "General"
+L["ReadyCheckHeader"] = "Ready check response"
+L["ReadyCheckEnabledTooltip"] = "Say something in /say when you answer Ready to a ready check."
+L["ReadyCheckResponseLabel"] = "Response:"

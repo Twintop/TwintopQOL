@@ -101,7 +101,7 @@ end
 SLASH_TWINTOPQOL1 = "/tqol"
 SLASH_TWINTOPQOL2 = "/twintopqol"
 SlashCmdList.TWINTOPQOL = function(msg)
-    local cmd, subcmd = TwintopQOL:ParseCmdString(msg)
+    local cmd = TwintopQOL:ParseCmdString(msg)
 
     if cmd == "" then
         TwintopQOL.Window:Toggle()
@@ -109,19 +109,6 @@ SlashCmdList.TWINTOPQOL = function(msg)
         TwintopQOL.Jokes:Send()
     elseif cmd == "jokes" then
         TwintopQOL.Window:Toggle("jokesList")
-    elseif cmd == "silly" then
-        local toggle = TwintopQOL:ParseCmdString(subcmd)
-        if toggle == "on" then
-            TwintopQOL.Silly:Enable()
-            TwintopQOLSaved.sillyEnabled = true
-            TwintopQOL:Print(L["SillyModeEnabled"])
-        elseif toggle == "off" then
-            TwintopQOL.Silly:Disable()
-            TwintopQOLSaved.sillyEnabled = false
-            TwintopQOL:Print(L["SillyModeDisabled"])
-        else
-            TwintopQOL:Print(L["SillyModeUsage"])
-        end
     elseif cmd == "talents" or cmd == "df" then
         TwintopQOL.Window:Toggle("talents")
     elseif cmd == "news" then
@@ -143,12 +130,10 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
             TwintopQOLSaved.news.enabled = true
         end
         TwintopQOLSaved.news.lastUpdate = TwintopQOLSaved.news.lastUpdate or ""
+        TwintopQOL.ReadyCheck:Init()
         TwintopQOL.Jokes:Init()
-
-        -- Restore silly mode from last session.
-        if TwintopQOLSaved.sillyEnabled then
-            TwintopQOL.Silly:Enable()
-        end
+        -- Both settings above started out as silly mode; it's carried over now.
+        TwintopQOLSaved.sillyEnabled = nil
 
         self:UnregisterEvent("ADDON_LOADED")
     elseif event == "PLAYER_LOGIN" then

@@ -40,8 +40,9 @@ end
 ---Creates a nav button with hover and selected textures, plus an expand arrow for headers.
 ---@param label string
 ---@param isHeader boolean
+---@param isMinor boolean Subsections and bottom pages use a smaller white font.
 ---@return Button
-local function CreateNavButton(label, isHeader)
+local function CreateNavButton(label, isHeader, isMinor)
     local btn = CreateFrame("Button", nil, navFrame)
     btn:SetHeight(NAV_BUTTON_HEIGHT)
 
@@ -63,7 +64,7 @@ local function CreateNavButton(label, isHeader)
     selected:Hide()
     btn.selectedTexture = selected
 
-    local text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    local text = btn:CreateFontString(nil, "OVERLAY", isMinor and "GameFontHighlightSmall" or "GameFontNormal")
     text:SetJustifyH("LEFT")
     text:SetPoint("LEFT", 6, 0)
     text:SetPoint("RIGHT", -4, 0)
@@ -284,7 +285,7 @@ local function CreateMainFrame()
     contentArea:SetPoint("BOTTOMRIGHT", -4, 4 + FOOTER_HEIGHT + 1)
 
     for key, entry in pairs(pages) do
-        entry.button = CreateNavButton(entry.label, entry.children ~= nil)
+        entry.button = CreateNavButton(entry.label, entry.children ~= nil, entry.parentKey ~= nil or entry.isBottom == true)
         if entry.children then
             entry.button:SetScript("OnClick", function()
                 entry.collapsed = not entry.collapsed
@@ -328,8 +329,40 @@ end
 ---@param label string
 ---@param builder fun(panel: Frame) Fills the page's panel; called the first time the page is shown.
 function TwintopQOL.Window:RegisterBottomPage(key, label, builder)
-    pages[key] = { key = key, label = label, builder = builder }
+    pages[key] = { key = key, label = label, builder = builder, isBottom = true }
     bottomOrder[#bottomOrder + 1] = key
+end
+
+---A ChatConfigCheckButtonTemplate checkbox, which shows its tooltip field on hover.
+---@class TwintopQOL.CheckButton : CheckButton
+---@field tooltip string
+
+---Creates a labeled checkbox for a settings page.
+---@param parent Frame
+---@param name string
+---@param label string
+---@param x number
+---@param y number
+---@return TwintopQOL.CheckButton
+function TwintopQOL.Window:CreateCheckButton(parent, name, label, x, y)
+    local checkbox = CreateFrame("CheckButton", name, parent, "ChatConfigCheckButtonTemplate") --[[@as TwintopQOL.CheckButton]]
+    checkbox:SetPoint("TOPLEFT", x, y)
+    _G[checkbox:GetName() .. "Text"]:SetText(label)
+    return checkbox
+end
+
+---Colors a checkbox label green (enabled) or red (disabled) and sets it to match.
+---@param checkbox CheckButton
+---@param enable boolean
+function TwintopQOL.Window:SetCheckboxOnOff(checkbox, enable)
+    local text = _G[checkbox:GetName() .. "Text"]
+    if enable then
+        text:SetTextColor(0, 1, 0)
+        text:SetText(L["Enabled"])
+    else
+        text:SetTextColor(1, 0, 0)
+        text:SetText(L["Disabled"])
+    end
 end
 
 ---@return Frame

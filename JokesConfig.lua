@@ -18,37 +18,6 @@ local contentTypeLabels = {
     arena = L["JokesContentArena"]
 }
 
----A ChatConfigCheckButtonTemplate checkbox, which shows its tooltip field on hover.
----@class TwintopQOL.CheckButton : CheckButton
----@field tooltip string
-
----@param parent Frame
----@param name string
----@param label string
----@param x number
----@param y number
----@return TwintopQOL.CheckButton
-local function BuildCheckButton(parent, name, label, x, y)
-    local checkbox = CreateFrame("CheckButton", name, parent, "ChatConfigCheckButtonTemplate") --[[@as TwintopQOL.CheckButton]]
-    checkbox:SetPoint("TOPLEFT", x, y)
-    _G[checkbox:GetName() .. "Text"]:SetText(label)
-    return checkbox
-end
-
----Colors a checkbox label green (enabled) or red (disabled) and sets it to match.
----@param checkbox CheckButton
----@param enable boolean
-local function ToggleCheckboxOnOff(checkbox, enable)
-    local text = _G[checkbox:GetName() .. "Text"]
-    if enable then
-        text:SetTextColor(0, 1, 0)
-        text:SetText(L["Enabled"])
-    else
-        text:SetTextColor(1, 0, 0)
-        text:SetText(L["Disabled"])
-    end
-end
-
 ---Enables a checkbox, or grays it out with a tooltip saying what turned it off.
 ---@param checkbox TwintopQOL.CheckButton
 ---@param enable boolean
@@ -77,7 +46,7 @@ local function BuildPage(panel)
     titleText:SetText(L["JokesConfigPageTitle"])
 
     local yCoord = -30
-    local enabledCheckbox = BuildCheckButton(panel, "TwintopQOLJokesEnabled", L["Enabled"], 0, yCoord)
+    local enabledCheckbox = TwintopQOL.Window:CreateCheckButton(panel, "TwintopQOLJokesEnabled", L["Enabled"], 0, yCoord)
     enabledCheckbox.tooltip = L["JokesEnabledTooltip"]
 
     local function RefreshContentCheckboxes()
@@ -89,7 +58,7 @@ local function BuildPage(panel)
 
     enabledCheckbox:SetScript("OnClick", function(self)
         config.enabled = self:GetChecked()
-        ToggleCheckboxOnOff(self, config.enabled)
+        TwintopQOL.Window:SetCheckboxOnOff(self, config.enabled)
         RefreshContentCheckboxes()
     end)
 
@@ -100,7 +69,7 @@ local function BuildPage(panel)
 
     yCoord = yCoord - 20
     for _, contentType in ipairs(TwintopQOL.Jokes.CONTENT_TYPES) do
-        local checkbox = BuildCheckButton(panel, "TwintopQOLJokesContent_" .. contentType, contentTypeLabels[contentType], 20, yCoord)
+        local checkbox = TwintopQOL.Window:CreateCheckButton(panel, "TwintopQOLJokesContent_" .. contentType, contentTypeLabels[contentType], 20, yCoord)
         checkbox:SetMotionScriptsWhileDisabled(true)
         checkbox:SetScript("OnClick", function(self)
             config.content[contentType] = self:GetChecked()
@@ -115,7 +84,7 @@ local function BuildPage(panel)
     behaviorHeader:SetText(L["JokesBehaviorHeader"])
 
     yCoord = yCoord - 20
-    local noRepeatsCheckbox = BuildCheckButton(panel, "TwintopQOLJokesNoRepeats", L["JokesNoRepeats"], 0, yCoord)
+    local noRepeatsCheckbox = TwintopQOL.Window:CreateCheckButton(panel, "TwintopQOLJokesNoRepeats", L["JokesNoRepeats"], 0, yCoord)
     noRepeatsCheckbox.tooltip = L["JokesNoRepeatsTooltip"]
     noRepeatsCheckbox:SetScript("OnClick", function(self)
         config.noRepeats = self:GetChecked()
@@ -123,7 +92,7 @@ local function BuildPage(panel)
 
     panel:SetScript("OnShow", function()
         enabledCheckbox:SetChecked(config.enabled)
-        ToggleCheckboxOnOff(enabledCheckbox, config.enabled)
+        TwintopQOL.Window:SetCheckboxOnOff(enabledCheckbox, config.enabled)
         RefreshContentCheckboxes()
         noRepeatsCheckbox:SetChecked(config.noRepeats)
     end)

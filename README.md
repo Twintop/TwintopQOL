@@ -23,11 +23,9 @@ A grab-bag of quality-of-life (and silly) things for World of Warcraft. Tell you
 - Reset to Defaults brings back the original list at any time.
 - If you never customize your list, you get new jokes automatically as they're added in updates.
 
-### Silly Mode
+### General
 
-Turn it on with `/tqol silly on` for a little extra personality in group content. It stays on until you turn it off.
-
-- Answering "ready" to a ready check says "Yes chef!" in `/say`.
+- Ready check response: when you answer "ready" to a ready check, says something in `/say`. "Yes chef!" by default, or type your own. Turn it on in the General page.
 
 ### Talents
 
@@ -50,7 +48,6 @@ A popup shows what's new whenever a new version is released. You can turn it off
 | `/tqol` | Opens or closes the Twintop QOL window |
 | `/tqol joke` | Tells a joke in group chat |
 | `/tqol jokes` | Opens the Joke Editor |
-| `/tqol silly on` / `/tqol silly off` | Turns Silly Mode on or off |
 | `/tqol talents` (or `/tqol df`) | Opens the Talents table |
 | `/tqol news` | Opens the News window |
 | `/tqol help` | Lists all commands in chat |

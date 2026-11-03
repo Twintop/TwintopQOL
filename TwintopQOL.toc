@@ -36,10 +36,11 @@ Localization\LocalizationPost.lua
 
 Core.lua
 Window.lua
+ReadyCheck.lua
+General.lua
 Jokes.lua
 JokesConfig.lua
 JokesEditor.lua
-Silly.lua
 Talents.lua
 About.lua
 NewsContent.lua
