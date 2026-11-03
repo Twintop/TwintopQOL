@@ -18,14 +18,18 @@ local contentTypeLabels = {
     arena = L["JokesContentArena"]
 }
 
+---A ChatConfigCheckButtonTemplate checkbox, which shows its tooltip field on hover.
+---@class TwintopQOL.CheckButton : CheckButton
+---@field tooltip string
+
 ---@param parent Frame
 ---@param name string
 ---@param label string
 ---@param x number
 ---@param y number
----@return CheckButton
+---@return TwintopQOL.CheckButton
 local function BuildCheckButton(parent, name, label, x, y)
-    local checkbox = CreateFrame("CheckButton", name, parent, "ChatConfigCheckButtonTemplate")
+    local checkbox = CreateFrame("CheckButton", name, parent, "ChatConfigCheckButtonTemplate") --[[@as TwintopQOL.CheckButton]]
     checkbox:SetPoint("TOPLEFT", x, y)
     _G[checkbox:GetName() .. "Text"]:SetText(label)
     return checkbox
@@ -46,7 +50,7 @@ local function ToggleCheckboxOnOff(checkbox, enable)
 end
 
 ---Enables a checkbox, or grays it out with a tooltip saying what turned it off.
----@param checkbox CheckButton
+---@param checkbox TwintopQOL.CheckButton
 ---@param enable boolean
 ---@param tooltip string
 local function ToggleCheckboxEnabled(checkbox, enable, tooltip)
