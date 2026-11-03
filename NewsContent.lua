@@ -6,8 +6,8 @@ TwintopQOL.NewsContent = [====[
 # 1.0.1-release (2026-11-04)
 ## Jokes
 
-- Run copyedit over the jokes list to fix typos, grammar, punctuation, and remove some that were effectively dungeon master jokes. The list is now ~450 jokes, down from ~500.
-- Only new users get this updated joke list. If you'd like the updated jokes, you can reset your joke list to the defaults in the Joke Editor.
+- Run copyedit over the jokes list to fix typos, grammar, punctuation, and remove duplicates and near-duplicates. The list is now ~450 jokes, down from ~500.
+- If you've customized your joke list, you'll keep it as is. To get the updated jokes, reset your list to the defaults in the Joke Editor.
 
 ---
 
