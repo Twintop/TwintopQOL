@@ -139,7 +139,12 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
 
         self:UnregisterEvent("ADDON_LOADED")
     elseif event == "PLAYER_LOGIN" then
-        TwintopQOL.News:Init()
+        -- Wait out the login sequence, which closes UISpecialFrames (the News window among them).
+        C_Timer.After(0, function()
+            C_Timer.After(1, function()
+                TwintopQOL.News:Init()
+            end)
+        end)
         self:UnregisterEvent("PLAYER_LOGIN")
     end
 end)
