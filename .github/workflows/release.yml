@@ -40,7 +40,7 @@ jobs:
     needs: checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -80,7 +80,7 @@ jobs:
           "ZIP_PATH=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Upload staged zip as a workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: staged-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.releaseType }}
           path: ${{ env.ZIP_PATH }}
@@ -97,7 +97,7 @@ jobs:
       WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
       GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -127,7 +127,7 @@ jobs:
 
       - name: Upload packager zip as a workflow artifact
         if: github.event_name == 'workflow_dispatch'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: packager
           path: .release/*.zip
