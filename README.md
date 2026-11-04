@@ -32,6 +32,7 @@ A grab-bag of quality-of-life (and silly) things for World of Warcraft. Tell you
 A sortable table of every talent in your active loadout, built for addon and WeakAura authors, theorycrafters, and the curious.
 
 - Shows each talent's name, spell ID, entry ID, node ID, definition ID, icon ID, tree ID, ranks, and whether it's active.
+- On Classic Era and The Burning Crusade Classic, lists every talent in your three talent trees instead: name, spell ID (of the rank you've learned), talent ID, tree, tab and index, icon ID, ranks, and whether it's learned.
 - Click a column header to sort by it.
 - Hover a row for the spell tooltip, or shift-click to link the spell in chat.
 - Export the whole table as tab-separated text, ready to paste into a spreadsheet.

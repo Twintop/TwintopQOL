@@ -27,6 +27,8 @@ Environment variables:
 - `TQOL_SAVED=<file>`: a WoW SavedVariables file to load before the addon. Your real
   `WTF\Account\<name>\SavedVariables\TwintopQOL.lua` works as-is.
 - `TQOL_DRIVER=<file>`: a driver, below.
+- `TQOL_INTERFACE=<number>`: the client to load as, by interface number (`11509`, `16001`, `20506`). The TOC lists
+  every flavor's, and the stubs otherwise follow its first, retail.
 
 ## Drivers
 
@@ -40,4 +42,5 @@ A driver is a Lua file returning hook functions, each called with a context tabl
 | Driver | Run by | What it does |
 | --- | --- | --- |
 | `drivers\pages.lua` | `smoke.ps1` | Builds every main window page, clicks the Jokes Configuration checkboxes, runs every slash command, and fires a boss wipe with wipe jokes on. Prints `PASS` and `FAIL` lines. |
-| `drivers\forever.lua` | `smoke.ps1` | Loads the addon as the WoW Forever client (`WOW_PROJECT_CAMELOT`): checks the Jokes content types are cut to the ones Forever has, the Talents page falls back to the dual spec group's config, and every page builds. Prints `PASS` and `FAIL` lines. |
+| `drivers\forever.lua` | `smoke.ps1` | Loads the addon as the WoW Forever client (`16001`, `WOW_PROJECT_CAMELOT`): checks the Jokes content types are cut to the ones Forever has, the Talents page falls back to the dual spec group's config, and every page builds. Prints `PASS` and `FAIL` lines. |
+| `drivers\classic.lua` | `smoke.ps1` | Loads the addon as the Classic Era (`11509`) or The Burning Crusade Classic (`20506`) client: checks the flavor flags and that client's rank spell table, that every page builds, and that the Talents page reads the talent tabs, shows each talent's learned (or rank 1) spell, exports the tab columns, and shows the talent tooltip. Prints `PASS` and `FAIL` lines. |

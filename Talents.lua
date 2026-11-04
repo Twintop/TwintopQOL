@@ -9,10 +9,11 @@ local ROW_HEIGHT = 18
 local HEADER_HEIGHT = 22
 local COLOR_ACTIVE = { 0.2, 0.9, 0.2 }
 local COLOR_INACTIVE = { 1, 0.2, 0.2 }
+local USES_TALENT_TABS = TwintopQOL.IsClassicEra or TwintopQOL.IsTBC
 
 -- Column definitions { key, header, width, align, sortKey }
 -- sortKey (optional) sorts on a different field than the one displayed.
-local COLUMNS = {
+local TRAIT_COLUMNS = {
     { key = "icon",         header = "",           width = 22,  align = "CENTER" },
     { key = "name",         header = L["TalentsColumnName"],         width = 200, align = "LEFT" },
     { key = "spellId",      header = L["TalentsColumnSpellId"],      width = 70,  align = "RIGHT" },
@@ -24,6 +25,23 @@ local COLUMNS = {
     { key = "ranks",        header = L["TalentsColumnRanks"],        width = 55,  align = "CENTER", sortKey = "currentRank" },
     { key = "status",       header = L["TalentsColumnStatus"],       width = 70,  align = "CENTER", sortKey = "activeSort" },
 }
+
+-- Talent tabs have no entry, node, or definition IDs. The client addresses a
+-- talent by its tab and its index within that tab.
+local TAB_COLUMNS = {
+    { key = "icon",         header = "",                         width = 22,  align = "CENTER" },
+    { key = "name",         header = L["TalentsColumnName"],     width = 200, align = "LEFT" },
+    { key = "spellId",      header = L["TalentsColumnSpellId"],  width = 70,  align = "RIGHT" },
+    { key = "talentId",     header = L["TalentsColumnTalentId"], width = 70,  align = "RIGHT" },
+    { key = "tree",         header = L["TalentsColumnTree"],     width = 110, align = "LEFT",   sortKey = "tab" },
+    { key = "tab",          header = L["TalentsColumnTab"],      width = 40,  align = "RIGHT" },
+    { key = "index",        header = L["TalentsColumnIndex"],    width = 45,  align = "RIGHT" },
+    { key = "iconId",       header = L["TalentsColumnIconId"],   width = 70,  align = "RIGHT" },
+    { key = "ranks",        header = L["TalentsColumnRanks"],    width = 55,  align = "CENTER", sortKey = "currentRank" },
+    { key = "status",       header = L["TalentsColumnStatus"],   width = 70,  align = "CENTER", sortKey = "activeSort" },
+}
+
+local COLUMNS = USES_TALENT_TABS and TAB_COLUMNS or TRAIT_COLUMNS
 
 ----------------------------------------------------------------------
 -- State
@@ -73,7 +91,7 @@ end
 -- Walk the active talent config and collect every node's spell, along with
 -- its entry/node/definition ids and rank info. A node is inactive when it is
 -- unranked or its sub-tree (hero talents) is inactive.
-local function GatherTalents()
+local function GatherTraitTalents()
     local result = {}
     local configId = GetActiveConfigId()
     if configId == nil then
@@ -133,6 +151,48 @@ local function GatherTalents()
     end
     return result, configId, configInfo
 end
+
+-- Walk every talent in the active talent group's tabs. The client reports
+-- spellID 0 for every talent, so the spell comes from TalentRankSpells: the
+-- learned rank's spell, or rank 1's while unlearned.
+local function GatherTabTalents()
+    local result = {}
+    local groupIndex = C_SpecializationInfo.GetActiveSpecGroup()
+
+    for tab = 1, GetNumTalentTabs() do
+        local _, treeName = C_SpecializationInfo.GetSpecializationInfo(tab, false, false, nil, nil, groupIndex)
+        for index = 1, GetNumTalents(tab) do
+            local info = C_SpecializationInfo.GetTalentInfo({ specializationIndex = tab, talentIndex = index, groupIndex = groupIndex })
+            if info ~= nil then
+                local spellId = info.spellID
+                if spellId == nil or spellId == 0 then
+                    local rankSpells = TwintopQOL.TalentRankSpells and TwintopQOL.TalentRankSpells[info.talentID]
+                    spellId = rankSpells and rankSpells[math.max(info.rank, 1)]
+                end
+                local active = info.rank > 0
+
+                result[#result + 1] = {
+                    order = #result + 1,
+                    iconId = info.icon,
+                    name = info.name or L["TalentsUnknownSpell"],
+                    spellId = spellId,
+                    talentId = info.talentID,
+                    tree = treeName,
+                    tab = tab,
+                    index = index,
+                    ranks = string.format(L["TalentsRanks"], info.rank, info.maxRank),
+                    currentRank = info.rank,
+                    active = active,
+                    activeSort = active and 1 or 0,
+                    status = active and L["TalentsStatusActive"] or L["TalentsStatusInactive"],
+                }
+            end
+        end
+    end
+    return result
+end
+
+local GatherTalents = USES_TALENT_TABS and GatherTabTalents or GatherTraitTalents
 
 ----------------------------------------------------------------------
 -- Sorting
@@ -208,7 +268,13 @@ local function EnsureRows(count)
 
         -- Hover for spell tooltip, shift-click to link in chat
         row:SetScript("OnEnter", function(self)
-            if self.spellId then
+            if self.talentId then
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                -- The talent tab clients take (talentID, isInspect, isPet, talentGroup).
+                ---@diagnostic disable-next-line: param-type-mismatch
+                GameTooltip:SetTalent(self.talentId, false, false, C_SpecializationInfo.GetActiveSpecGroup())
+                GameTooltip:Show()
+            elseif self.spellId then
                 GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
                 GameTooltip:SetSpellByID(self.spellId)
                 GameTooltip:Show()
@@ -244,6 +310,7 @@ local function RefreshDisplay()
     for i, entry in ipairs(sorted) do
         local row = rows[i]
         row.spellId = entry.spellId
+        row.talentId = entry.talentId
 
         if entry.iconId then
             row.icon:SetTexture(entry.iconId)
@@ -485,6 +552,10 @@ local function BuildPage(panel)
     panel:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     -- Dual spec swaps
     panel:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+    if USES_TALENT_TABS then
+        -- A talent learned or reset, as the talent tab clients' own talent frame reads it
+        panel:RegisterEvent("PLAYER_TALENT_UPDATE")
+    end
     panel:SetScript("OnEvent", function(self)
         if self:IsVisible() then
             Rescan()

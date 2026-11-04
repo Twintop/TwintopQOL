@@ -2,8 +2,22 @@ local _, TwintopQOL = ...
 
 TwintopQOL = TwintopQOL or {}
 TwintopQOL.Data = TwintopQOL.Data or {}
+local interfaceVersion = tonumber((select(4, GetBuildInfo())))
+
+-- TwintopInsanityBar's client check: a project ID naming another flavor rules a client out, and the interface number
+-- tells the rest apart. An unreadable project ID or interface number isn't evidence of a mismatch.
+local function IsClient(projectId, lowestInterface, highestInterface)
+    if WOW_PROJECT_ID ~= nil and projectId ~= nil and WOW_PROJECT_ID ~= projectId then
+        return false
+    end
+    return interfaceVersion == nil or (interfaceVersion >= lowestInterface and interfaceVersion <= highestInterface)
+end
+
 -- WoW Forever (internally "Camelot"). WOW_PROJECT_CAMELOT is nil on retail.
-TwintopQOL.IsForever = WOW_PROJECT_ID == WOW_PROJECT_CAMELOT
+TwintopQOL.IsForever = IsClient(WOW_PROJECT_CAMELOT, 16001, 19999)
+-- Classic Era (Vanilla) and The Burning Crusade Classic (Anniversary), which have talent tabs instead of trait trees.
+TwintopQOL.IsClassicEra = IsClient(WOW_PROJECT_CLASSIC, 11300, 15999)
+TwintopQOL.IsTBC = IsClient(WOW_PROJECT_BURNING_CRUSADE_CLASSIC, 20000, 29999)
 
 local L = TwintopQOL.Localization
 

@@ -3,9 +3,10 @@
 	Smoke-loads the addon under the stubbed-API harness and fails on real errors.
 
 .DESCRIPTION
-	Runs build\harness\load.lua three times: once through the login events; once with
-	build\harness\drivers\pages.lua, which builds every main window page and runs every slash command; and once with
-	build\harness\drivers\forever.lua, which loads the addon as the WoW Forever client.
+	Runs build\harness\load.lua five times: once through the login events; once with
+	build\harness\drivers\pages.lua, which builds every main window page and runs every slash command; once with
+	build\harness\drivers\forever.lua, which loads the addon as the WoW Forever client; and twice with
+	build\harness\drivers\classic.lua, which loads it as the Classic Era and The Burning Crusade Classic clients.
 	ERROR, SYNTAX, EVENT ERROR, DRIVER ERROR, and FAIL lines fail the run; TIMER ERROR lines are counted only.
 	See build\harness\README.md.
 
@@ -27,20 +28,25 @@ if ($null -eq (Get-Command $Lua -ErrorAction SilentlyContinue)) {
 	throw "Lua interpreter '$Lua' not found. Install Lua 5.1 or pass -Lua <path>."
 }
 
+# Interface is the client the run loads as, from the TOC's Interface line; empty is the line's first (retail).
 $runs = @(
-	[pscustomobject]@{ Name = "login"; Driver = "" },
-	[pscustomobject]@{ Name = "pages"; Driver = (Join-Path $scriptDir "harness\drivers\pages.lua") },
-	[pscustomobject]@{ Name = "forever"; Driver = (Join-Path $scriptDir "harness\drivers\forever.lua") }
+	[pscustomobject]@{ Name = "login"; Driver = ""; Interface = "" },
+	[pscustomobject]@{ Name = "pages"; Driver = (Join-Path $scriptDir "harness\drivers\pages.lua"); Interface = "" },
+	[pscustomobject]@{ Name = "forever"; Driver = (Join-Path $scriptDir "harness\drivers\forever.lua"); Interface = "16001" },
+	[pscustomobject]@{ Name = "classic"; Driver = (Join-Path $scriptDir "harness\drivers\classic.lua"); Interface = "11509" },
+	[pscustomobject]@{ Name = "tbc"; Driver = (Join-Path $scriptDir "harness\drivers\classic.lua"); Interface = "20506" }
 )
 
 $failed = $false
 foreach ($run in $runs) {
 	$env:TQOL_DRIVER = $run.Driver
+	$env:TQOL_INTERFACE = $run.Interface
 	try {
 		$output = & $Lua $harness $root "TwintopQOL.toc" 5 $events 2>&1 | Out-String
 		$exitCode = $LASTEXITCODE
 	} finally {
 		Remove-Item Env:TQOL_DRIVER -ErrorAction SilentlyContinue
+		Remove-Item Env:TQOL_INTERFACE -ErrorAction SilentlyContinue
 	}
 	$lines = $output -split "`n"
 	$real = ($lines | Where-Object { $_ -match "^(ERROR|SYNTAX|EVENT ERROR|DRIVER ERROR|FAIL)" }).Count

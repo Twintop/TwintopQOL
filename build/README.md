@@ -8,6 +8,7 @@ lua-language-server for the type check.
 | Smoke-load the addon and build every page | `.\build\smoke.ps1 -Lua <lua5.1>` |
 | Type-check with LuaLS against the baseline | `.\build\luals-check.ps1` (finds the VS Code extensions; `-UpdateBaseline` rewrites it) |
 | Check that new enUS strings are appended | `.\tools\Validate-LocalizationAppendOnly.ps1` |
+| Regenerate a talent tab flavor's rank spells from wago.tools | `.\tools\Update-TalentRankSpells.ps1 -Flavor classic -Build 1.15.9.70576` (or `-Flavor tbc`) |
 | Build a release zip locally (into `dist\`) | `.\build\stage.ps1` |
 | Same, stamping a version | `.\build\stage.ps1 -Version 1.0.1 -ReleaseType beta01` |
 

@@ -36,7 +36,9 @@
             "ScrollingEdit_OnUpdate",
             "CLOSE",
             "Settings",
-            "WOW_PROJECT_CAMELOT"
+            "WOW_PROJECT_CAMELOT",
+            "GetNumTalentTabs",
+            "GetNumTalents"
         ]
     },
     "type": {

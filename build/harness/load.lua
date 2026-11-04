@@ -79,6 +79,12 @@ do
 	end
 end
 
+-- Optional interface number: TQOL_INTERFACE loads the TOC as that flavor's client would, since one TOC lists them all.
+local interfaceOverride = os.getenv("TQOL_INTERFACE")
+if interfaceOverride and interfaceOverride ~= "" then
+	metadata.Interface = interfaceOverride
+end
+
 -- Stubs
 local stubs = require("stubs")
 -- The addon name is the TOC file name, as the client derives it.

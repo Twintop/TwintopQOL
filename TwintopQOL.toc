@@ -1,4 +1,4 @@
-## Interface: 120105, 16001
+## Interface: 120105, 20506, 16001, 11509
 ## Title: Twintop QOL
 ## Author: Twintop
 ## X-AuthorServer: Frostmourne-US/OCE
@@ -42,6 +42,8 @@ General.lua
 Jokes.lua
 JokesConfig.lua
 JokesEditor.lua
+TalentSpellsClassic.lua
+TalentSpellsTBC.lua
 Talents.lua
 About.lua
 NewsContent.lua
