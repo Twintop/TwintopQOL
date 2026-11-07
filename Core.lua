@@ -150,6 +150,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
         TwintopQOL.Jokes:Init()
         -- Both settings above started out as silly mode; it's carried over now.
         TwintopQOLSaved.sillyEnabled = nil
+        TwintopQOL.FlightTimer:Init()
 
         self:UnregisterEvent("ADDON_LOADED")
     elseif event == "PLAYER_LOGIN" then

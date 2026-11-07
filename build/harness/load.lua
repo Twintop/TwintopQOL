@@ -127,14 +127,25 @@ local function RunHook(name)
 	end
 end
 
+-- Libraries the stubs fake in full, as TwintopInsanityBar's harness does: loading the real ones on top would replace
+-- part of the fake, leaving callbacks that never fire.
+local stubbedLibs = { ["Libs/CallbackHandler-1.0.lua"] = true, ["Libs/LibSharedMedia-3.0.lua"] = true }
+local skipped = 0
+
 RunHook("afterInstall")
 for _, path in ipairs(files) do
 	local rel = path:sub(#normalize(addonDir) + 2)
-	local chunk, err = loadfile(path)
-	if not chunk then
-		failures = failures + 1
-		print("SYNTAX  " .. rel .. "\n    " .. tostring(err))
+	local chunk, err
+	if stubbedLibs[rel] then
+		skipped = skipped + 1
 	else
+		chunk, err = loadfile(path)
+		if not chunk then
+			failures = failures + 1
+			print("SYNTAX  " .. rel .. "\n    " .. tostring(err))
+		end
+	end
+	if chunk then
 		local ok, rerr = xpcall(function() return chunk(addonName, ns) end, function(e)
 			return debug.traceback(tostring(e), 2)
 		end)
@@ -146,7 +157,7 @@ for _, path in ipairs(files) do
 		end
 	end
 end
-print(string.format("Loaded %d files, %d failures", loaded, failures))
+print(string.format("Loaded %d files (%d libs skipped), %d failures", loaded, skipped, failures))
 local loadedCleanly = failures == 0
 if loadedCleanly then
 	RunHook("afterLoad")

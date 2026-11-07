@@ -365,6 +365,208 @@ function TwintopQOL.Window:SetCheckboxOnOff(checkbox, enable)
     end
 end
 
+---A slider from CreateSlider, with its title and the box that shows and takes its value.
+---@class TwintopQOL.Slider : Slider, BackdropTemplate
+---@field Title FontString
+---@field EditBox EditBox
+
+---Creates a horizontal slider with a title above it, its range at its ends, and a box below it to type a value into.
+---Its top left goes where the slider is placed; the title sits above that.
+---@param parent Frame
+---@param name string
+---@param title string
+---@param minValue number
+---@param maxValue number
+---@param step number
+---@param width number
+---@param onChanged fun(value: number) Called with every new value, from dragging, the mouse wheel, or typing.
+---@return TwintopQOL.Slider
+function TwintopQOL.Window:CreateSlider(parent, name, title, minValue, maxValue, step, width, onChanged)
+    local slider = CreateFrame("Slider", name, parent, "BackdropTemplate") --[[@as TwintopQOL.Slider]]
+    slider:SetOrientation("HORIZONTAL")
+    slider:SetSize(width, 17)
+    slider:SetMinMaxValues(minValue, maxValue)
+    slider:SetValueStep(step)
+    slider:SetObeyStepOnDrag(true)
+    slider:EnableMouseWheel(true)
+    slider:SetBackdrop({
+        bgFile = "Interface\\Buttons\\UI-SliderBar-Background",
+        edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",
+        tile = true, tileSize = 8, edgeSize = 8,
+        insets = { left = 3, right = 3, top = 6, bottom = 6 }
+    })
+    slider:SetThumbTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal")
+
+    slider.Title = slider:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    slider.Title:SetPoint("BOTTOMLEFT", slider, "TOPLEFT", 0, 2)
+    slider.Title:SetText(title)
+
+    local minText = slider:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    minText:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 0, -2)
+    minText:SetText(tostring(minValue))
+    local maxText = slider:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    maxText:SetPoint("TOPRIGHT", slider, "BOTTOMRIGHT", 0, -2)
+    maxText:SetText(tostring(maxValue))
+
+    local editBox = CreateFrame("EditBox", nil, slider, "BackdropTemplate")
+    slider.EditBox = editBox
+    editBox:SetSize(50, 16)
+    editBox:SetPoint("TOP", slider, "BOTTOM", 0, -2)
+    editBox:SetAutoFocus(false)
+    editBox:SetFontObject("GameFontHighlightSmall")
+    editBox:SetJustifyH("CENTER")
+    editBox:SetTextInsets(4, 4, 0, 0)
+    editBox:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1
+    })
+    editBox:SetBackdropColor(0, 0, 0, 1)
+    editBox:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+    -- Setting a slider to the value it has doesn't fire OnValueChanged, so the box starts out showing it.
+    editBox:SetText(tostring(slider:GetValue()))
+    editBox:SetScript("OnEnterPressed", function()
+        local value = tonumber(editBox:GetText())
+        if value then
+            value = math.floor(value / step + 0.5) * step
+            slider:SetValue(math.min(math.max(value, minValue), maxValue))
+        end
+        -- A typed value the slider already had doesn't change it, so the box is set back here.
+        editBox:SetText(tostring(slider:GetValue()))
+        editBox:ClearFocus()
+    end)
+    editBox:SetScript("OnEscapePressed", function()
+        editBox:SetText(tostring(slider:GetValue()))
+        editBox:ClearFocus()
+    end)
+
+    slider:SetScript("OnValueChanged", function(_, value)
+        editBox:SetText(tostring(value))
+        onChanged(value)
+    end)
+    slider:SetScript("OnMouseWheel", function(_, delta)
+        slider:SetValue(math.min(math.max(slider:GetValue() + delta * step, minValue), maxValue))
+    end)
+    return slider
+end
+
+---A color swatch from CreateColorSwatch.
+---@class TwintopQOL.ColorSwatch : Button, BackdropTemplate
+---@field Color Texture
+---@field Refresh fun(self: TwintopQOL.ColorSwatch) Shows the color it was made to show, as it is now.
+
+---Creates a color swatch with a label to its right. Clicking it opens the color picker, which changes the color as it
+---moves and puts it back on Cancel.
+---@param parent Frame
+---@param name string
+---@param label string
+---@param getColor fun(): number, number, number
+---@param setColor fun(r: number, g: number, b: number)
+---@return TwintopQOL.ColorSwatch
+function TwintopQOL.Window:CreateColorSwatch(parent, name, label, getColor, setColor)
+    local swatch = CreateFrame("Button", name, parent, "BackdropTemplate") --[[@as TwintopQOL.ColorSwatch]]
+    swatch:SetSize(20, 20)
+    swatch:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = 1 })
+    swatch:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+
+    swatch.Color = swatch:CreateTexture(nil, "ARTWORK")
+    swatch.Color:SetPoint("TOPLEFT", 1, -1)
+    swatch.Color:SetPoint("BOTTOMRIGHT", -1, 1)
+
+    local text = swatch:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    text:SetPoint("LEFT", swatch, "RIGHT", 6, 0)
+    text:SetText(label)
+
+    function swatch:Refresh()
+        self.Color:SetColorTexture(getColor())
+    end
+
+    swatch:SetScript("OnClick", function()
+        local r, g, b = getColor()
+        ColorPickerFrame:SetupColorPickerAndShow({
+            r = r,
+            g = g,
+            b = b,
+            hasOpacity = false,
+            swatchFunc = function()
+                setColor(ColorPickerFrame:GetColorRGB())
+                swatch:Refresh()
+            end,
+            cancelFunc = function(previous)
+                setColor(previous.r, previous.g, previous.b)
+                swatch:Refresh()
+            end
+        })
+    end)
+    swatch:Refresh()
+    return swatch
+end
+
+-- How a media dropdown's rows show their media, by media type. Each runs after the menu sets up the row, with the row
+-- and the media's file, and returns the row's size when the menu can't measure it.
+local mediaRows = {
+    -- TwintopInsanityBar's texture rows: the texture runs from the name's left to the row's right edge.
+    statusbar = function(button, path)
+        local rightEdge = button:AttachTexture()
+        rightEdge:SetSize(1, 18)
+        rightEdge:SetPoint("RIGHT")
+        local fontString = button.fontString
+
+        local texture = button:AttachTexture()
+        texture:SetTexture(path)
+        texture:SetDrawLayer("BACKGROUND")
+        texture:SetPoint("LEFT", fontString, "LEFT")
+        texture:SetPoint("RIGHT", rightEdge, "LEFT")
+        texture:SetSize(fontString:GetUnboundedStringWidth(), 16)
+        fontString:SetDrawLayer("OVERLAY")
+
+        -- The row's size, which the menu can't work out with the texture attached.
+        return fontString:GetUnboundedStringWidth() + rightEdge:GetWidth(), 20
+    end,
+    -- The name in its own font, at the menu's size. The menu sets its text back to its own font when it reuses it.
+    font = function(button, path)
+        local fontString = button.fontString
+        local _, size, flags = fontString:GetFont()
+        fontString:SetFont(path, size, flags)
+        -- The menu measures the row by its text, fitted to the menu's font before this.
+        fontString:SetTextToFit(fontString:GetText())
+    end
+}
+
+---Creates a dropdown of LibSharedMedia's status bar textures, each drawn behind its name, or its fonts, each name
+---written in its font. The list is read each time it opens, so media other addons register later show up.
+---@param parent Frame
+---@param name string
+---@param mediaType "statusbar"|"font"
+---@param width number
+---@param getName fun(): string The media name to check.
+---@param setName fun(name: string)
+---@return DropdownButton
+function TwintopQOL.Window:CreateMediaDropdown(parent, name, mediaType, width, getName, setName)
+    local sharedMedia = LibStub("LibSharedMedia-3.0")
+    local showMedia = mediaRows[mediaType]
+    local dropdown = CreateFrame("DropdownButton", name, parent, "WowStyle1DropdownTemplate")
+    dropdown:SetWidth(width)
+
+    local function IsSelected(mediaName)
+        return mediaName == getName()
+    end
+
+    dropdown:SetupMenu(function(_, rootDescription)
+        local paths = sharedMedia:HashTable(mediaType)
+        for _, mediaName in ipairs(sharedMedia:List(mediaType)) do
+            local radio = rootDescription:CreateRadio(mediaName, IsSelected, setName, mediaName)
+            radio:AddInitializer(function(button)
+                return showMedia(button, paths[mediaName])
+            end)
+        end
+        rootDescription:SetScrollMode(400)
+    end)
+    -- Shown while the checked name isn't one LibSharedMedia has, such as one from an addon that isn't loaded.
+    dropdown:SetDefaultText(string.format(L["MediaNotLoaded"], getName()))
+    return dropdown
+end
+
 ---@return Frame
 function TwintopQOL.Window:GetFrame()
     CreateMainFrame()

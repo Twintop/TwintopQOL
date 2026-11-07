@@ -38,7 +38,12 @@
             "Settings",
             "WOW_PROJECT_CAMELOT",
             "GetNumTalentTabs",
-            "GetNumTalents"
+            "GetNumTalents",
+            "FlightMapFrame",
+            "TaxiNodeOnButtonEnter",
+            "FlightMap_FlightPointPinMixin",
+            "ColorPickerFrame",
+            "STANDARD_TEXT_FONT"
         ]
     },
     "type": {

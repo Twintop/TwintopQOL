@@ -1,9 +1,12 @@
 -- Loads the addon as a talent tab client, Classic Era or The Burning Crusade Classic by the interface number smoke.ps1
 -- passes: checks the flavor flags and rank spell table, builds every main window page, and checks the Talents page reads
--- the talent tabs, picks each talent's spell from the table, exports the tab columns, and shows the talent tooltip.
+-- the talent tabs, picks each talent's spell from the table, exports the tab columns, and shows the talent tooltip. Also
+-- flies the flight timer through a flight with a stop on the way, and checks the flight master window's tooltips.
 local driver = {}
--- Desktop Lua 5.1 library, which the workspace's WoW runtime config leaves undefined.
-local debug = (_G --[[@as table<string, any>]]).debug
+-- Desktop Lua 5.1 libraries, which the workspace's WoW runtime config leaves undefined.
+local desktop = _G --[[@as table<string, any>]]
+local debug, require = desktop.debug, desktop.require
+local taxi = require("taxi")
 
 -- Of the stubs' six talents, these two get a learned rank 2 and an unlearned rank 0; the rest stay at rank 1.
 local LEARNED_TALENT = 121
@@ -43,6 +46,7 @@ end
 
 function driver.afterInstall()
 	local G = _G --[[@as table<string, any>]]
+	taxi.Install()
 	local getTalentInfo = G.C_SpecializationInfo.GetTalentInfo
 	G.C_SpecializationInfo.GetTalentInfo = function(query)
 		talentQueries = talentQueries + 1
@@ -78,7 +82,7 @@ function driver.afterEvents(ctx)
 		assert(ranks[134] and ranks[134][1] == expected, "talent 134's rank 1 is " .. tostring(ranks[134] and ranks[134][1]))
 	end)
 
-	for _, key in ipairs({ "generalGeneral", "jokesConfig", "jokesList", "talents", "about" }) do
+	for _, key in ipairs({ "generalGeneral", "generalFlightTimer", "jokesConfig", "jokesList", "talents", "about" }) do
 		failures = failures + Check("page " .. key, function()
 			ns.Window:Show(key)
 		end)
@@ -115,6 +119,19 @@ function driver.afterEvents(ctx)
 	-- A 40-player raid wipe, with wipe jokes on.
 	_G.TwintopQOLSaved.jokesConfig.enabled = true
 	failures = failures + ctx.stubs.fireEvents("ENCOUNTER_END:1;Boss;9;40;0", ctx.addonName)
+
+	failures = failures + Check("flight timer times a flight with a stop", function()
+		taxi.Fly(taxi.TWO_HOPS, 45)
+		local recorded = _G.TwintopQOLSaved.flightTimer.times[taxi.TWO_HOPS_ROUTE]
+		assert(recorded == 45, "recorded " .. tostring(recorded))
+	end)
+
+	failures = failures + Check("flight master tooltips show a route's time", function()
+		local text = taxi.HoverButton(taxi.TWO_HOPS)
+		assert(text:find("Menethil Harbor", 1, true) and text:find("Flight time: 0:45", 1, true), "the tooltip reads " .. text)
+		text = taxi.HoverButton(taxi.DIRECT)
+		assert(not text:find("Flight time", 1, true), "an untimed route has a time: " .. text)
+	end)
 
 	return failures
 end

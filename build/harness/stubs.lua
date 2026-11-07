@@ -329,6 +329,7 @@ function M.install(opts)
 	for _, fontName in ipairs({ "GameFontNormal", "GameFontHighlight", "GameFontHighlightSmall", "GameFontGreenSmall", "GameFontNormalSmall", "GameFontWhite", "GameFontDisableSmallLeft", "GameFontHighlightSmallLeft", "GameFontNormalSmallLeft", "GameFontNormalLarge", "GameFontHighlightLarge", "GameFontDisable", "GameFontRed", "NumberFontNormal", "ChatFontNormal", "GameTooltipText", "GameFontNormalHuge", "SystemFont_Shadow_Med1", "GameFontNormalMed3" }) do
 		G[fontName] = newFrame("Font", fontName)
 	end
+	G.STANDARD_TEXT_FONT = "Fonts\\FRIZQT__.TTF"
 	G.BackdropTemplateMixin = {}
 	G.TooltipBackdropTemplateMixin = {}
 	G.DefaultTooltipMixin = {}
