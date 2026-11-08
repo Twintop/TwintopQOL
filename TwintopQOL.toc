@@ -2,9 +2,9 @@
 ## Title: Twintop QOL
 ## Author: Twintop
 ## X-AuthorServer: Frostmourne-US/OCE
-## Version: 1.0.1
+## Version: 1.0.2
 ## X-ReleaseType: release
-## X-ReleaseDate: 2026-11-04
+## X-ReleaseDate: 2026-11-08
 ## SavedVariables: TwintopQOLSaved
 ## DefaultState: enabled
 ## IconTexture: Interface\AddOns\TwintopQOL\Images\icon.png
