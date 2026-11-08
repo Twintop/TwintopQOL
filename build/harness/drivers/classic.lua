@@ -120,6 +120,10 @@ function driver.afterEvents(ctx)
 	_G.TwintopQOLSaved.jokesConfig.enabled = true
 	failures = failures + ctx.stubs.fireEvents("ENCOUNTER_END:1;Boss;9;40;0", ctx.addonName)
 
+	-- The flight timer, turned on.
+	ns.FlightTimer:SetShowBar(true)
+	ns.FlightTimer:SetShowTooltips(true)
+
 	failures = failures + Check("flight timer times a flight with a stop", function()
 		taxi.Fly(taxi.TWO_HOPS, 45)
 		local recorded = _G.TwintopQOLSaved.flightTimer.times[taxi.TWO_HOPS_ROUTE]

@@ -538,11 +538,12 @@ end
 function TwintopQOL.FlightTimer:Init()
     TwintopQOLSaved.flightTimer = TwintopQOLSaved.flightTimer or {}
     local config = TwintopQOLSaved.flightTimer
+    -- Off until the player turns it on, like every feature.
     if config.showBar == nil then
-        config.showBar = true
+        config.showBar = false
     end
     if config.showTooltips == nil then
-        config.showTooltips = true
+        config.showTooltips = false
     end
     if config.locked == nil then
         config.locked = false

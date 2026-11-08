@@ -69,6 +69,29 @@ local function CheckFlightTimer(ctx)
 	local times = flightTimer.times
 	local failures = 0
 
+	failures = failures + Check("flight timer is off until turned on", function()
+		assert(flightTimer.showBar == false and flightTimer.showTooltips == false, "the bar or the tooltips start on")
+		taxi.Fly(taxi.DIRECT, 60, function(elapsed)
+			if elapsed == 20 then
+				local bar = taxi.GetBar()
+				assert(flightTimer.inFlight == nil and not (bar and bar:IsShown()), "timing a flight before it's turned on")
+			end
+		end)
+		assert(times[taxi.DIRECT_ROUTE] == nil, "recorded " .. tostring(times[taxi.DIRECT_ROUTE]))
+	end)
+
+	failures = failures + Check("flight timer checkboxes turn it on", function()
+		ns.Window:Show("generalFlightTimer")
+		for _, name in ipairs({ "TwintopQOLFlightTimerShowBar", "TwintopQOLFlightTimerShowTooltips" }) do
+			local checkbox = _G[name]
+			checkbox.GetChecked = function() return true end
+			Click(name)
+			-- Back to the stubs' GetChecked, which reads unchecked, so a click turns it off again.
+			checkbox.GetChecked = nil
+		end
+		assert(flightTimer.showBar == true and flightTimer.showTooltips == true, "the bar is " .. tostring(flightTimer.showBar) .. ", the tooltips " .. tostring(flightTimer.showTooltips))
+	end)
+
 	failures = failures + Check("flight map tooltips wait for a time", function()
 		taxi.LoadFlightMap()
 		for _, slot in ipairs({ taxi.DIRECT, taxi.TWO_HOPS }) do

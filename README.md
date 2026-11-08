@@ -30,7 +30,7 @@ A grab-bag of quality-of-life (and silly) things for World of Warcraft. Tell you
 
 ### Flight Timer
 
-Times every flight you take from a flight master, so the next time you fly that route you know how long is left.
+Times every flight you take from a flight master, so the next time you fly that route you know how long is left. It's off until you turn on the bar, the tooltips, or both, on the Flight Timer page under General (flights are timed while either is on).
 
 - Hover a flight point on the flight map to see how long the flight there takes.
 - The first time you fly a route, a bar counts up while it's timed. After that, the bar counts down the time left.
@@ -38,7 +38,7 @@ Times every flight you take from a flight master, so the next time you fly that 
 - Each route keeps its fastest time, shared by all your characters. A route is timed by every stop it makes, so a character that knows fewer flight points, and flies a longer way to the same place, gets times of its own.
 - Flights you leave early (by requesting an early landing, taking a summon, or porting into a battleground or dungeon) aren't recorded.
 - On WoW Forever, flights with and without the Frequent Flier legacy perk are timed separately, so a respec doesn't throw either off. A route timed only one way is estimated for the other.
-- Drag the bar to move it. On the Flight Timer page under General, turn off the bar or the tooltips (flights are timed while either is on), put the bar back where it started, or forget every recorded time.
+- Drag the bar to move it. On the Flight Timer page, you can also put the bar back where it started, or forget every recorded time.
 - Make the bar your own on the same page: lock it in place (a locked bar lets clicks through), set its width and height, pick its texture and font from any LibSharedMedia status bar texture and font, set its font size, and choose its color, plus the color it shows while timing a new route. The bar shows a preview while the page is open.
 
 ### Talents

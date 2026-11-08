@@ -97,6 +97,9 @@ function driver.afterEvents(ctx)
 	_G.TwintopQOLSaved.jokesConfig.enabled = true
 	failures = failures + ctx.stubs.fireEvents("ENCOUNTER_END:1;Boss;9;40;0", ctx.addonName)
 
+	-- The flight timer, turned on.
+	ns.FlightTimer:SetShowBar(true)
+	ns.FlightTimer:SetShowTooltips(true)
 	local flightTimer = _G.TwintopQOLSaved.flightTimer
 
 	failures = failures + Check("flight timer times Frequent Flier flights apart", function()
