@@ -1,5 +1,5 @@
--- Builds every main window page, clicks the General and Jokes Configuration settings, runs every slash command, and
--- flies the flight timer through new, timed, estimated, interrupted, and missed flights, checking the flight map's
+-- Builds every main window page, clicks the General and Jokes Configuration settings, runs every slash command, tells
+-- jokes in each channel /tqol joke takes, and flies the flight timer through new, timed, estimated, interrupted, and missed flights, checking the flight map's
 -- tooltips along the way and the bar and tooltips each turned off. Then sets the timer bar's lock, size, texture,
 -- font, and colors, watching its preview.
 local driver = {}
@@ -380,6 +380,101 @@ local function CheckTimerBar(ctx)
 	return failures
 end
 
+---Tells jokes with /tqol joke and a channel, solo and in each kind of group, checking where each one goes.
+---@param ctx table The driver context.
+---@return number failures
+local function CheckJokeChannels(ctx)
+	local G = _G --[[@as table<string, any>]]
+	local ns = ctx.ns
+	local failures = 0
+	local isInGroup, isInRaid, isInGuild, print = G.IsInGroup, G.IsInRaid, G.IsInGuild, ns.Print
+	local sent, printed = {}, {}
+	G.C_ChatInfo.SendChatMessage = function(message, channel, _, target)
+		sent[#sent + 1] = { message = message, channel = channel, target = target }
+	end
+	ns.Print = function(_, message) printed[#printed + 1] = message end
+
+	-- Puts the player in a home or instance group, as a party or a raid. No category leaves every group.
+	local function Join(category, raid)
+		local function InCategory(c) return category ~= nil and (c == nil or c == category) end
+		G.IsInGroup = InCategory
+		G.IsInRaid = function(c) return raid == true and InCategory(c) end
+	end
+
+	-- Runs a command and checks the one joke it sent, or with no channel, that it sent none and said why.
+	local function Expect(command, channel, target)
+		sent, printed = {}, {}
+		SlashCmdList.TWINTOPQOL(command)
+		if channel then
+			assert(#sent == 1, command .. " sent " .. #sent .. " jokes")
+			assert(sent[1].channel == channel, command .. " went to " .. tostring(sent[1].channel) .. ", not " .. channel)
+			assert(sent[1].target == target, command .. " went to " .. tostring(sent[1].target))
+			assert(type(sent[1].message) == "string" and sent[1].message ~= "", command .. " sent an empty joke")
+			assert(#printed == 0, command .. " printed " .. tostring(printed[1]))
+		else
+			assert(#sent == 0, command .. " sent a joke to " .. tostring(sent[1] and sent[1].channel))
+			assert(#printed == 1, command .. " printed " .. #printed .. " lines")
+		end
+	end
+
+	failures = failures + Check("/tqol joke <channel> solo", function()
+		Join(nil)
+		Expect("joke say", "SAY")
+		Expect("joke YELL", "YELL")
+		Expect("joke e", "EMOTE")
+		Expect("joke whisper Bob-Realm", "WHISPER", "Bob-Realm")
+		Expect("joke w")
+		Expect("joke party")
+		Expect("joke raid")
+		Expect("joke rw")
+		Expect("joke instance")
+		Expect("joke guild")
+		Expect("joke officer")
+		Expect("joke trade")
+		sent, printed = {}, {}
+		SlashCmdList.TWINTOPQOL("joke")
+		assert(#sent == 0 and #printed == 0, "joke did something solo")
+	end)
+
+	failures = failures + Check("/tqol joke <channel> in a home party", function()
+		Join(G.LE_PARTY_CATEGORY_HOME)
+		Expect("joke", "PARTY")
+		Expect("joke party", "PARTY")
+		Expect("joke instance", "PARTY")
+		Expect("joke raid")
+	end)
+
+	failures = failures + Check("/tqol joke <channel> in a home raid", function()
+		Join(G.LE_PARTY_CATEGORY_HOME, true)
+		Expect("joke", "RAID")
+		Expect("joke raid", "RAID")
+		Expect("joke instance", "RAID")
+		Expect("joke party", "PARTY")
+		Expect("joke rw", "RAID_WARNING")
+	end)
+
+	failures = failures + Check("/tqol joke <channel> in an instance group", function()
+		Join(G.LE_PARTY_CATEGORY_INSTANCE)
+		Expect("joke", "INSTANCE_CHAT")
+		Expect("joke party", "INSTANCE_CHAT")
+		Expect("joke instance", "INSTANCE_CHAT")
+		Expect("joke raid")
+		Join(G.LE_PARTY_CATEGORY_INSTANCE, true)
+		Expect("joke raid", "INSTANCE_CHAT")
+	end)
+
+	failures = failures + Check("/tqol joke <channel> in a guild", function()
+		Join(nil)
+		G.IsInGuild = function() return true end
+		Expect("joke guild", "GUILD")
+		Expect("joke o", "OFFICER")
+	end)
+
+	G.IsInGroup, G.IsInRaid, G.IsInGuild, ns.Print = isInGroup, isInRaid, isInGuild, print
+	G.C_ChatInfo.SendChatMessage = nil
+	return failures
+end
+
 function driver.afterEvents(ctx)
 	local ns = ctx.ns
 	local failures = 0
@@ -413,6 +508,7 @@ function driver.afterEvents(ctx)
 			SlashCmdList.TWINTOPQOL(command)
 		end)
 	end
+	failures = failures + CheckJokeChannels(ctx)
 
 	-- A Mythic raid wipe, with wipe jokes on.
 	_G.TwintopQOLSaved.jokesConfig.enabled = true

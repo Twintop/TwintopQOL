@@ -117,12 +117,12 @@ end
 SLASH_TWINTOPQOL1 = "/tqol"
 SLASH_TWINTOPQOL2 = "/twintopqol"
 SlashCmdList.TWINTOPQOL = function(msg)
-    local cmd = TwintopQOL:ParseCmdString(msg)
+    local cmd, args = TwintopQOL:ParseCmdString(msg)
 
     if cmd == "" then
         TwintopQOL.Window:Toggle()
     elseif cmd == "joke" then
-        TwintopQOL.Jokes:Send()
+        TwintopQOL.Jokes:Command(args)
     elseif cmd == "jokes" then
         TwintopQOL.Window:Toggle("jokesList")
     elseif cmd == "talents" or cmd == "df" then

@@ -1,6 +1,8 @@
 local _, TwintopQOL = ...
 TwintopQOL.Jokes = TwintopQOL.Jokes or {}
 
+local L = TwintopQOL.Localization
+
 -- Shipped joke list. Seeds a new install, and is what "Reset to Defaults" restores.
 -- Players who never customize their list always use this (so they pick up new
 -- jokes in addon updates); a custom list is stored in TwintopQOLSaved.jokes.
@@ -648,6 +650,110 @@ function TwintopQOL.Jokes:Send()
     elseif IsInGroup() then
         C_ChatInfo.SendChatMessage(PickJoke(), "PARTY")
     end
+end
+
+-- Chat channels /tqol joke can name, with the words that pick each one: its name and the chat box's short commands.
+local CHANNEL_WORDS = {
+    SAY = { "say", "s" },
+    YELL = { "yell", "y", "shout", "sh" },
+    EMOTE = { "emote", "e", "em", "me" },
+    PARTY = { "party", "p" },
+    RAID = { "raid", "ra" },
+    RAID_WARNING = { "rw", "raidwarning" },
+    INSTANCE_CHAT = { "instance", "i" },
+    GUILD = { "guild", "g" },
+    OFFICER = { "officer", "o" },
+    WHISPER = { "whisper", "w", "tell", "t" }
+}
+
+local channelByWord = {}
+for channel, words in pairs(CHANNEL_WORDS) do
+    for _, word in ipairs(words) do
+        channelByWord[word] = channel
+    end
+end
+
+---Picks the channel that reaches the player's group, the way the chat box does: party and raid chat go to instance
+---chat in an instance group only, and instance chat goes to raid or party chat in a home group only.
+---@param channel string
+---@return string? channel Nil when nobody would hear it.
+---@return string? reason Why nobody would hear it.
+local function ResolveChannel(channel)
+    if channel == "PARTY" then
+        if IsInGroup(LE_PARTY_CATEGORY_HOME) then
+            return "PARTY"
+        elseif IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+            return "INSTANCE_CHAT"
+        end
+        return nil, L["ErrNotInGroup"]
+    elseif channel == "RAID" then
+        if IsInRaid(LE_PARTY_CATEGORY_HOME) then
+            return "RAID"
+        elseif IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
+            return "INSTANCE_CHAT"
+        end
+        return nil, L["ErrNotInRaid"]
+    elseif channel == "INSTANCE_CHAT" then
+        if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+            return "INSTANCE_CHAT"
+        elseif IsInRaid(LE_PARTY_CATEGORY_HOME) then
+            return "RAID"
+        elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
+            return "PARTY"
+        end
+        return nil, L["ErrNotInInstanceGroup"]
+    elseif channel == "RAID_WARNING" then
+        if not IsInRaid() then
+            return nil, L["ErrNotInRaid"]
+        end
+    elseif channel == "GUILD" or channel == "OFFICER" then
+        if not IsInGuild() then
+            return nil, L["ErrNotInGuild"]
+        end
+    end
+    return channel
+end
+
+---Tells a joke in a chat channel. Prints why instead when nobody would hear it.
+---@param channel string A chat type, as SendChatMessage takes it.
+---@param target? string Who a whisper goes to.
+function TwintopQOL.Jokes:SendTo(channel, target)
+    if #GetActiveList() == 0 then
+        return
+    end
+
+    local resolved, reason = ResolveChannel(channel)
+    if not resolved then
+        TwintopQOL:Print(reason)
+        return
+    end
+    C_ChatInfo.SendChatMessage(PickJoke(), resolved, nil, target)
+end
+
+---Handles /tqol joke: tells a joke in group chat, or in the channel named, as in "say", "raid", or "whisper Name".
+---@param args? string What followed "joke".
+function TwintopQOL.Jokes:Command(args)
+    local word, rest = TwintopQOL:ParseCmdString(args)
+    if word == "" then
+        self:Send()
+        return
+    end
+
+    local channel = channelByWord[strlower(word)]
+    if not channel then
+        TwintopQOL:Print(string.format(L["JokesUnknownChannel"], word))
+        return
+    end
+
+    local target
+    if channel == "WHISPER" then
+        target = strtrim(rest or "")
+        if target == "" then
+            TwintopQOL:Print(L["JokesWhisperNoTarget"])
+            return
+        end
+    end
+    self:SendTo(channel, target)
 end
 
 ---Fills in missing Configuration settings. Called once saved variables are loaded.

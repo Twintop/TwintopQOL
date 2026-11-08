@@ -628,6 +628,7 @@ function M.install(opts)
 	G.YES = "Yes"
 	G.NO = "No"
 	G.CLOSE = "Close"
+	G.LE_PARTY_CATEGORY_HOME = 1
 	G.LE_PARTY_CATEGORY_INSTANCE = 2
 	G.GetCVar = retNil
 	G.GetCVarBool = retFalse
@@ -642,6 +643,7 @@ function M.install(opts)
 	G.GetInstanceInfo = function() return "None", "none", 0, "", 0, 0, false, 0, 0 end
 	G.IsInRaid = retFalse
 	G.IsInGroup = retFalse
+	G.IsInGuild = retFalse
 	G.GetNumGroupMembers = retZero
 	G.IsMounted = retFalse
 	G.IsFlying = retFalse

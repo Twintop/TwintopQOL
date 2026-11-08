@@ -43,7 +43,11 @@
             "TaxiNodeOnButtonEnter",
             "FlightMap_FlightPointPinMixin",
             "ColorPickerFrame",
-            "STANDARD_TEXT_FONT"
+            "STANDARD_TEXT_FONT",
+            "ERR_NOT_IN_GROUP",
+            "ERR_NOT_IN_RAID",
+            "ERR_NOT_IN_INSTANCE_GROUP",
+            "ERR_GUILD_PLAYER_NOT_IN_GUILD"
         ]
     },
     "type": {

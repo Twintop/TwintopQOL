@@ -12,6 +12,7 @@ A grab-bag of quality-of-life (and silly) things for World of Warcraft. Tell you
 ### Jokes
 
 - Type `/tqol joke` to tell a joke in your group's chat: raid, instance, or party, whichever fits. Nothing is sent when you're not in a group.
+- Name a channel to tell it there instead: `/tqol joke say`, `yell`, `emote`, `party`, `raid`, `rw` (raid warning), `instance`, `guild`, `officer`, or `whisper` and a name. The chat box's short forms work too (`s`, `y`, `p`, `g`, `w`, and so on). As in the chat box, party and raid go to instance chat in a group from the Dungeon Finder or Raid Finder.
 - Ships with over 450 jokes, from groan-worthy puns to a few written just for WoW players.
 - Wipe jokes: after a boss wipe, tells your group a joke to lighten the mood. Turn them on in the Jokes Configuration page, and choose which content they play in: open world, each dungeon and raid difficulty, Mythic+, delves, scenarios, battlegrounds, and arenas.
 - By default, jokes don't repeat until every joke on your list has been told, even across sessions. Uncheck it in Configuration for pure random picks.
@@ -61,6 +62,7 @@ A popup shows what's new whenever a new version is released. You can turn it off
 | --- | --- |
 | `/tqol` | Opens or closes the Twintop QOL window |
 | `/tqol joke` | Tells a joke in group chat |
+| `/tqol joke <channel>` | Tells a joke in `say`, `yell`, `emote`, `party`, `raid`, `rw`, `instance`, `guild`, `officer`, or `whisper <name>` |
 | `/tqol jokes` | Opens the Joke Editor |
 | `/tqol talents` (or `/tqol df`) | Opens the Talents table |
 | `/tqol news` | Opens the News window |

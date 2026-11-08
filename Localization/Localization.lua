@@ -19,5 +19,9 @@ L["ChannelRaid"] = RAID
 L["ChannelRaidWarning"] = RAID_WARNING
 L["ChannelParty"] = PARTY
 L["ChannelEmote"] = EMOTE
+L["ErrNotInGroup"] = ERR_NOT_IN_GROUP
+L["ErrNotInRaid"] = ERR_NOT_IN_RAID
+L["ErrNotInInstanceGroup"] = ERR_NOT_IN_INSTANCE_GROUP
+L["ErrNotInGuild"] = ERR_GUILD_PLAYER_NOT_IN_GUILD
 
 TwintopQOL.Localization = L
