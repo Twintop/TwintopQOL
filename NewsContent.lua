@@ -3,6 +3,15 @@ local _, TwintopQOL = ...
 -- Changelog shown by the News window (News.lua renders it). Markdown; newest release first.
 TwintopQOL.NewsContent = [====[
 
+# 1.0.3-release (2026-11-12)
+
+## News
+
+- Updated LibSimpleHTMLMarkdown, the library that draws this window, to its latest version.
+- Opening this window no longer changes the colors of text in other AddOns that use LibSimpleHTMLMarkdown.
+
+---
+
 # 1.0.2-release (2026-11-08)
 
 ## General

@@ -2,7 +2,18 @@ local addonName, TwintopQOL = ...
 TwintopQOL.News = TwintopQOL.News or {}
 
 local L = TwintopQOL.Localization
-local LSHM = LibStub("LibSimpleHTMLMarkdown-1.0")
+-- A renderer of our own, with a cleaner palette for the inline color escapes. Its settings apply only to our
+-- text; the library's own config is shared by every AddOn.
+local LSHM = LibStub("LibSimpleHTMLMarkdown-1.0"):New({
+    ["strong"]  = "|cffffcc00",
+    ["/strong"] = "|r",
+    ["em"]      = "|cffff9966",
+    ["/em"]     = "|r",
+    ["code"]    = "|cffaaaadd",
+    ["/code"]   = "|r",
+    ["pre"]     = "<p>|cffaaaadd",
+    ["/pre"]    = "|r</p><br />",
+})
 
 local ADDON_VERSION = C_AddOns.GetAddOnMetadata(addonName, "Version") .. "-" .. C_AddOns.GetAddOnMetadata(addonName, "X-ReleaseType")
 
@@ -100,16 +111,6 @@ local function CreateMainFrame()
     showAgain:SetScript("OnClick", function(self)
         TwintopQOLSaved.news.enabled = self:GetChecked()
     end)
-
-    -- Override LibSimpleHTMLMarkdown inline color escapes for a cleaner palette
-    LSHM.config["strong"]  = "|cffffcc00"
-    LSHM.config["/strong"] = "|r"
-    LSHM.config["em"]      = "|cffff9966"
-    LSHM.config["/em"]     = "|r"
-    LSHM.config["code"]    = "|cffaaaadd"
-    LSHM.config["/code"]   = "|r"
-    LSHM.config["pre"]     = "<p>|cffaaaadd"
-    LSHM.config["/pre"]    = "|r</p><br />"
 
     BuildReader(frame)
 end
