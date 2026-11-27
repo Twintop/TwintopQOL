@@ -3,6 +3,18 @@ local _, TwintopQOL = ...
 -- Changelog shown by the News window (News.lua renders it). Markdown; newest release first.
 TwintopQOL.NewsContent = [====[
 
+# 1.0.4-release (2026-11-27)
+
+## Flight Timer
+
+- Estimates for a route you haven't flown yet now use a leg's time in either direction. A leg you've only flown the other way counts with that time, so more routes get an estimate, marked with ~, sooner.
+
+## News
+
+- Updated LibSimpleHTMLMarkdown to its latest version.
+
+---
+
 # 1.0.3-release (2026-11-12)
 
 ## News

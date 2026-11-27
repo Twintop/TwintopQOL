@@ -82,7 +82,8 @@ local function LookUpTime(route, frequentFlier)
     return nil, false
 end
 
----How long a route should take: its own time, or else the sum of its legs' times when every leg has one.
+---How long a route should take: its own time, or else the sum of its legs' times when every leg has one. A leg
+---without a time of its own takes its time flown the other way, which goes for a route of one leg too.
 ---@param route string
 ---@param frequentFlier boolean
 ---@return number|nil seconds
@@ -93,16 +94,15 @@ local function GetRouteTime(route, frequentFlier)
         return seconds, estimated
     end
 
+    -- A route has at least two stops.
     local stops = {}
     for stop in route:gmatch("[^>]+") do
         stops[#stops + 1] = stop
     end
-    if #stops < 3 then
-        return nil, false
-    end
     local total = 0
     for i = 2, #stops do
-        local leg = LookUpTime(stops[i - 1] .. ">" .. stops[i], frequentFlier)
+        local from, to = stops[i - 1], stops[i]
+        local leg = LookUpTime(from .. ">" .. to, frequentFlier) or LookUpTime(to .. ">" .. from, frequentFlier)
         if not leg then
             return nil, false
         end

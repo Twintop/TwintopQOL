@@ -34,7 +34,7 @@ Times every flight you take from a flight master, so the next time you fly that 
 
 - Hover a flight point on the flight map to see how long the flight there takes.
 - The first time you fly a route, a bar counts up while it's timed. After that, the bar counts down the time left.
-- A route you haven't flown yet gets an estimate, marked with ~, once you've flown each of its legs on its own.
+- A route you haven't flown yet gets an estimate, marked with ~, once you've flown each of its legs on its own, in either direction.
 - Each route keeps its fastest time, shared by all your characters. A route is timed by every stop it makes, so a character that knows fewer flight points, and flies a longer way to the same place, gets times of its own.
 - Flights you leave early (by requesting an early landing, taking a summon, or porting into a battleground or dungeon) aren't recorded.
 - On WoW Forever, flights with and without the Frequent Flier legacy perk are timed separately, so a respec doesn't throw either off. A route timed only one way is estimated for the other.

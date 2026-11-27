@@ -17,6 +17,9 @@ taxi.TWO_HOPS = 3
 taxi.TWO_HOPS_ROUTE = "2>6>7"
 -- The second leg of TWO_HOPS, from the second flight point to the third, which this flight master can't fly on its own.
 taxi.SECOND_LEG_ROUTE = "6>7"
+-- DIRECT and the second leg of TWO_HOPS flown the other way, which this flight master can't fly either.
+taxi.DIRECT_RETURN_ROUTE = "6>2"
+taxi.SECOND_LEG_RETURN_ROUTE = "7>6"
 
 local now = 1000
 local onTaxi = false

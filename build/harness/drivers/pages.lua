@@ -101,6 +101,14 @@ local function CheckFlightTimer(ctx)
 		end
 	end)
 
+	failures = failures + Check("flight timer estimates a direct route from its time the other way", function()
+		times[taxi.DIRECT_RETURN_ROUTE] = 50
+		local text = taxi.HoverPin(taxi.DIRECT)
+		-- Forgotten again before the check can fail, so the flights after this one find the route untimed.
+		times[taxi.DIRECT_RETURN_ROUTE] = nil
+		assert(text:find("Flight time: ~0:50", 1, true), "the tooltip reads " .. text)
+	end)
+
 	failures = failures + Check("flight timer times a new route", function()
 		taxi.Fly(taxi.DIRECT, 60, function(elapsed)
 			if elapsed == 20 then
@@ -140,6 +148,11 @@ local function CheckFlightTimer(ctx)
 	failures = failures + Check("flight timer estimates a route from its legs", function()
 		local text = taxi.HoverPin(taxi.TWO_HOPS)
 		assert(not text:find("Flight time", 1, true), "estimated with a leg untimed: " .. text)
+		-- The second leg, flown only the other way.
+		times[taxi.SECOND_LEG_RETURN_ROUTE] = 35
+		text = taxi.HoverPin(taxi.TWO_HOPS)
+		assert(text:find("Flight time: ~1:30", 1, true), "with a leg flown only the other way, the tooltip reads " .. text)
+		-- A leg's own time comes before its time the other way.
 		times[taxi.SECOND_LEG_ROUTE] = 30
 		text = taxi.HoverPin(taxi.TWO_HOPS)
 		assert(text:find("Flight time: ~1:25", 1, true), "the tooltip reads " .. text)
